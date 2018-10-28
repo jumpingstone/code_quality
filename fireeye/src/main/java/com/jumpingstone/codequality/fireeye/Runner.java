@@ -7,8 +7,11 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Runner {
+    Logger logger = LoggerFactory.getLogger(Runner.class);
 
     public static class Scanner {
         public void scan(Path filePath) throws IOException {
