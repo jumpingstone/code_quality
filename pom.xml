@@ -11,7 +11,6 @@
     <modules>
         <module>fireeye</module>
         <module>sonar_test</module>
-        <module>fireeye</module>
     </modules>
 
 
