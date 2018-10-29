@@ -7,6 +7,7 @@ import net.sourceforge.pmd.cpd.Mark;
 import net.sourceforge.pmd.cpd.Match;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 
@@ -25,14 +26,16 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
 
         cpd.go();
 
+        int commonLength = 0;
         for (Iterator<Match> it = cpd.getMatches(); it.hasNext(); ) {
             Match match = it.next();
-
-            Iterator<Mark> occurrences = match.iterator();
-            if (occurrences.hasNext()) {
-                occurrences.next();
-            }
+            String source = match.getSourceCodeSlice();
+            commonLength += source.length();
         }
-        return 0;
+
+        int leftLength = Files.lines(file).map(l -> l.length()).reduce((a,b)-> a+ b).get();
+        int rightLength = Files.lines(file2compare).map(l -> l.length()).reduce((a,b)-> a+ b).get();
+
+        return commonLength * 1.0f / Math.min(leftLength, rightLength);
     }
 }

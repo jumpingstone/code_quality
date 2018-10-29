@@ -1,6 +1,7 @@
 package com.jumpingstone.codequality.fireeye.cals;
 
 import com.jumpingstone.codequality.fireeye.FileSimilarityGraphic;
+import com.jumpingstone.codequality.fireeye.SimilarityCalculator;
 import com.jumpingstone.codequality.fireeye.SimilarityGraphicNode;
 
 import java.io.IOException;
@@ -11,6 +12,17 @@ import java.util.*;
  * Created by chenwei on 2018/10/28.
  */
 public class SimilarityCalculatorManager {
+
+    private List<SimilarityCalculator> calculatorList = new ArrayList<>();
+    private IScoreAggregator aggregator = Aggregators.AVG;
+
+    public void addCalculator(SimilarityCalculator calculator) {
+        calculatorList.add(calculator);
+    }
+
+    public void setAggregator(IScoreAggregator aggregator) {
+        this.aggregator = aggregator;
+    }
 
     public void updateSimilarity(FileSimilarityGraphic network, Path file) throws IOException {
         Set<Path> visitedMap = new HashSet<>();
@@ -34,7 +46,19 @@ public class SimilarityCalculatorManager {
     }
 
     private float calculate(Path fileToCompare, Path file) {
-        return 0;
+        //pre calculate
+        Map<Class<? extends SimilarityCalculator>, Float> scores = new HashMap<>();
+        calculatorList.parallelStream().forEach( c -> {
+            float score = 0;
+            try {
+                score = c.calculate(file, fileToCompare);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            scores.put(c.getClass(), score);
+        });
+
+        return aggregator.aggregate(scores);
     }
 
 }
