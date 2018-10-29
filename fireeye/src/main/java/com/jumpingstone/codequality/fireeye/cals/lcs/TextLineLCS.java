@@ -1,4 +1,4 @@
-package com.jumpingstone.codequality.fireeye;
+package com.jumpingstone.codequality.fireeye.cals.lcs;
 
 /*******************************************************************************
  * Copyright (c) 2006, 2011 IBM Corporation and others.

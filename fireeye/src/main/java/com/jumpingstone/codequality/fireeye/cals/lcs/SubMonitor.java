@@ -1,4 +1,4 @@
-package com.jumpingstone.codequality.fireeye;
+package com.jumpingstone.codequality.fireeye.cals.lcs;
 
 public class SubMonitor {
     public boolean isCanceled() {

@@ -11,7 +11,9 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="fireeye" target="1.7" />
+      <module name="codequality.parent" target="1.5" />
+      <module name="fireeye" target="1.8" />
+      <module name="sonar_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
