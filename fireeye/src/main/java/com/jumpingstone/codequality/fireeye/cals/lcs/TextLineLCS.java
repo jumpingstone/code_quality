@@ -75,7 +75,7 @@ public class TextLineLCS extends LCS {
      * TODO: investigate what to do about comments. shifting either up or down
      * hurts them
      *
-     * @param lcsSide A subsequence of original, presumably it is the LCS of it and
+     * @param lcsSide RangeDifferencer.java subsequence of original, presumably it is the LCS of it and
      *            some other collection of lines
      * @param len The number of non-null entries in lcs
      * @param original The original sequence of lines of which lcs is a

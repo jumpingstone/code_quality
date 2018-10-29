@@ -1,6 +1,7 @@
 package com.jumpingstone.codequality.fireeye.cals.lcs;
 
-import com.jumpingstone.codequality.fireeye.OperationCanceledException;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 
 /*******************************************************************************
  * Copyright (c) 2000, 2014 IBM Corporation and others.
