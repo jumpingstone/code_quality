@@ -14,13 +14,12 @@ package com.jumpingstone.codequality.fireeye.cals.lcs;
  *     IBM Corporation - initial API and implementation
  *******************************************************************************/
 
-        import org.eclipse.core.runtime.IProgressMonitor;
-        import org.eclipse.core.runtime.OperationCanceledException;
-        import org.eclipse.core.runtime.SubMonitor;
-        import sun.misc.resources.Messages;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.SubMonitor;
 
-        import java.util.ArrayList;
-        import java.util.List;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /* package */ class RangeComparatorLCS extends LCS {
@@ -85,16 +84,16 @@ package com.jumpingstone.codequality.fireeye.cals.lcs;
                 int l1, l2;
                 int s1 = -1;
                 int s2 = -1;
-                while(index1 < this.lcs[0].length && index2 < this.lcs[1].length) {
+                while (index1 < this.lcs[0].length && index2 < this.lcs[1].length) {
                     // Move both LCS lists to the next occupied slot
-                    while ((l1= this.lcs[0][index1]) == 0) {
+                    while ((l1 = this.lcs[0][index1]) == 0) {
                         index1++;
                         if (index1 >= this.lcs[0].length)
                             break;
                     }
                     if (index1 >= this.lcs[0].length)
                         break;
-                    while ((l2= this.lcs[1][index2]) == 0) {
+                    while ((l2 = this.lcs[1][index2]) == 0) {
                         index2++;
                         if (index2 >= this.lcs[1].length)
                             break;
@@ -149,9 +148,9 @@ package com.jumpingstone.codequality.fireeye.cals.lcs;
      * from the LCS algorithm), compacts it and shifts the LCS chunks as far towards
      * the front as possible. This tends to produce good results most of the time.
      *
-     * @param lcsSide A subsequence of original, presumably it is the LCS of it and
-     *            some other collection of lines
-     * @param length The number of non-empty (i.e non-zero) entries in LCS
+     * @param lcsSide    A subsequence of original, presumably it is the LCS of it and
+     *                   some other collection of lines
+     * @param length     The number of non-empty (i.e non-zero) entries in LCS
      * @param comparator The comparator used to generate the LCS
      */
     private void compactAndShiftLCS(int[] lcsSide, int length,
