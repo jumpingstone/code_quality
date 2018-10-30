@@ -26,20 +26,29 @@ public class SimilarityCalculatorManager {
 
     public void updateSimilarity(FileSimilarityGraphic network, Path file) throws IOException {
         Set<Path> visitedMap = new HashSet<>();
+        SimilarityGraphicNode newNode = network.createNode(file);
+        visitedMap.add(file);
+
         Iterator<SimilarityGraphicNode> nodeIterator = network.getNodes();
-        visit(file, visitedMap, nodeIterator);
+        visit(newNode, network, visitedMap, nodeIterator);
     }
 
-    private void visit(Path file, Set<Path> visitedMap, Iterator<SimilarityGraphicNode> nodeIterator) {
+    private void visit(Path file, SimilarityGraphicNode newNode,
+                       FileSimilarityGraphic network,
+                       Set<Path> visitedMap,
+                       Iterator<SimilarityGraphicNode> nodeIterator) {
         while(nodeIterator.hasNext()) {
             SimilarityGraphicNode node = nodeIterator.next();
             Path fileToCompare = node.getFile();
             if (!visitedMap.contains(fileToCompare)) {
                 visitedMap.add(fileToCompare);
+
                 float similarity = calculate(fileToCompare, file);
                 if (similarity > 0.3) {
+                    network.updateSimilarity(newNode, node, similarity);
+
                     Iterator<SimilarityGraphicNode> similarNodes = node.getSimilarNodes(0.8f);
-                    visit(file, visitedMap, similarNodes);
+                    visit(file, newNode, network, visitedMap, similarNodes);
                 }
             }
         }

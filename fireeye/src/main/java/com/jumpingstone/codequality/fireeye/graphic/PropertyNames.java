@@ -5,4 +5,5 @@ package com.jumpingstone.codequality.fireeye.graphic;
  */
 public abstract class PropertyNames {
     public static final String FILE_NAME = "FileName";
+    public static final String SIMILARITY = "Similarity";
 }

@@ -8,7 +8,11 @@ import java.util.Iterator;
  */
 public interface FileSimilarityGraphic {
 
+    SimilarityGraphicNode createNode(Path file);
+
     SimilarityGraphicNode getNode(Path file);
 
     Iterator<SimilarityGraphicNode> getNodes();
+
+    void updateSimilarity(SimilarityGraphicNode newNode, SimilarityGraphicNode node, float similarity);
 }
