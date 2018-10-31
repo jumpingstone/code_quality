@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+  <component name="ExternalSystem" externalSystem="Maven" />
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -21,7 +22,6 @@
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-procedure-api:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-kernel-api:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-common:3.4.9" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-values:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-collections:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-primitive-collections:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-unsafe:3.4.9" level="project" />
@@ -33,10 +33,6 @@
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-configuration:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-index:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-spatial-index:3.4.9" level="project" />
-    <orderEntry type="library" name="Maven: org.neo4j:neo4j-ssl:3.4.9" level="project" />
-    <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.24.Final" level="project" />
-    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.60" level="project" />
-    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.60" level="project" />
     <orderEntry type="library" name="Maven: org.neo4j:neo4j-lucene-index:3.4.9" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-analyzers-common:5.5.5" level="project" />
     <orderEntry type="library" name="Maven: org.apache.lucene:lucene-core:5.5.5" level="project" />
@@ -87,12 +83,21 @@
     <orderEntry type="module-library">
       <library name="Maven: jdk.tools:jdk.tools:1.6">
         <CLASSES>
-          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home/lib/tools.jar!/" />
+          <root url="jar://C:/programs/Java/jdk1.8.0_111/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-bolt:3.4.9" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-values:3.4.9" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-ssl:3.4.9" level="project" />
+    <orderEntry type="library" name="Maven: io.netty:netty-all:4.1.24.Final" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-mapper-asl:1.9.13" level="project" />
+    <orderEntry type="library" name="Maven: org.codehaus.jackson:jackson-core-asl:1.9.13" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.7" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.60" level="project" />
+    <orderEntry type="library" name="Maven: org.bouncycastle:bcprov-jdk15on:1.60" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.0.13" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.0.13" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:1.7.5" level="project" />
@@ -102,11 +107,16 @@
     <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: net.java.dev.javacc:javacc:5.0" level="project" />
     <orderEntry type="library" name="Maven: net.sourceforge.saxon:saxon:9.1.0.8" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.commons:commons-lang3:3.7" level="project" />
     <orderEntry type="library" name="Maven: org.ow2.asm:asm:6.2.1" level="project" />
     <orderEntry type="library" name="Maven: com.google.code.gson:gson:2.5" level="project" />
     <orderEntry type="library" scope="RUNTIME" name="Maven: net.sourceforge.saxon:saxon:dom:9.1.0.8" level="project" />
     <orderEntry type="library" name="Maven: net.sourceforge.pmd:pmd-java8:6.8.0" level="project" />
     <orderEntry type="library" name="Maven: net.sourceforge.pmd:pmd-java:6.8.0" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-ogm-core:3.1.4" level="project" />
+    <orderEntry type="library" name="Maven: org.neo4j:neo4j-ogm-api:3.1.4" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.7.1" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
+    <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.7.1" level="project" />
+    <orderEntry type="library" name="Maven: io.github.lukehutch:fast-classpath-scanner:2.18.1" level="project" />
   </component>
 </module>

@@ -7,6 +7,8 @@ import com.jumpingstone.codequality.fireeye.cals.pcd.PCDSimilarityCalculator;
 import com.jumpingstone.codequality.fireeye.persistent.GraphicDBSimilarityService;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
+import org.neo4j.kernel.configuration.BoltConnector;
 
 import java.io.File;
 
@@ -16,9 +18,20 @@ import java.io.File;
 public class ObjectFactory {
 
     public FileSimilarityGraphic createDatabase(String graphicDBDirectory) {
-        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabase( new File(graphicDBDirectory) );
-        registerShutdownHook( graphDb );
+        int port = 7678;
+        GraphDatabaseService graphDb = createGraphicDB(graphicDBDirectory, port);
         return new GraphicDBSimilarityService(graphDb);
+    }
+
+    public GraphDatabaseService createGraphicDB(String graphicDBDirectory, int port) {
+        BoltConnector bolt = new BoltConnector( "0" );
+        GraphDatabaseService graphDb = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder( new File(graphicDBDirectory) )
+                .setConfig( bolt.type, "BOLT" )
+                .setConfig( bolt.enabled, "true" )
+                .setConfig( bolt.listen_address, "localhost:" + port )
+                .newGraphDatabase();
+        registerShutdownHook( graphDb );
+        return graphDb;
     }
 
     public SimilarityCalculatorManager createCalculator() {

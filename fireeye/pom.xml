@@ -44,6 +44,11 @@
             <version>3.4.9</version>
         </dependency>
         <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-bolt</artifactId>
+            <version>3.4.9</version>
+        </dependency>
+        <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
@@ -57,6 +62,12 @@
             <groupId>net.sourceforge.pmd</groupId>
             <artifactId>pmd-java8</artifactId>
             <version>6.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-core</artifactId>
+            <version>RELEASE</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

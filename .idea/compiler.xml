@@ -7,12 +7,14 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="fireeye" />
+        <module name="fireeye.service" />
         <module name="sonar_test" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="codequality.parent" target="1.5" />
       <module name="fireeye" target="1.8" />
+      <module name="fireeye.service" target="1.8" />
       <module name="sonar_test" target="1.8" />
     </bytecodeTargetLevel>
   </component>

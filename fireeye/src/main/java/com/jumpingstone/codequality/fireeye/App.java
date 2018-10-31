@@ -8,6 +8,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Hello world!
@@ -46,19 +48,10 @@ public class App
         if (cmd.hasOption("database")) {
             graphicDBDirectory = cmd.getOptionValue("database");
         }
-        ObjectFactory objectFactory = new ObjectFactory();
 
-        FileSimilarityGraphic graphicDB = objectFactory.createDatabase(graphicDBDirectory);
-        final SimilarityCalculatorManager calculatorManager = objectFactory.createCalculator();
 
-        Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                if (file.endsWith(".java")) {
-                    calculatorManager.updateSimilarity(graphicDB, file);
-                }
-                return super.visitFile(file, attrs);
-            }
-        });
+
+
+
     }
 }
