@@ -1,6 +1,6 @@
 package com.jumpingstone.codequality.fireeye.service.controller;
 
-import com.jumpingstone.codequality.fireeye.Project;
+import com.jumpingstone.codequality.fireeye.model.IProject;
 import com.jumpingstone.codequality.fireeye.service.ProjectService;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
 import org.hamcrest.BaseMatcher;
@@ -19,12 +19,22 @@ public class ProjectController {
     private ProjectService projectManager;
 
     @PostMapping("/{project_id}")
-    private Mono<Project> createProject(@PathVariable String project_id, @RequestBody ProjectDefinition projectDefinition) {
+    private Mono<IProject> createProject(@PathVariable String project_id, @RequestBody ProjectDefinition projectDefinition) {
         return projectManager.createProject(project_id, projectDefinition);
     }
 
+    @PostMapping("/scan/{project_id}")
+    private Mono<IProject> scanProject(@PathVariable String project_id) {
+        return projectManager.scanProject(project_id);
+    }
+
+    @GetMapping("")
+    private Flux<IProject> getProjects() {
+        return projectManager.findProject(ProjectMatchers.matchAny());
+    }
+
     @GetMapping("/{project_id}")
-    private Mono<Project> getProject(@PathVariable String project_id) {
+    private Mono<IProject> getProject(@PathVariable String project_id) {
         return projectManager.getProject(project_id);
     }
 
@@ -41,21 +51,21 @@ public class ProjectController {
     }
 
     @GetMapping("/name/like/{name}")
-    private Flux<Project> findProjectsByName(@PathVariable String name) {
+    private Flux<IProject> findProjectsByName(@PathVariable String name) {
         return projectManager.findProject(ProjectMatchers.matchName(name));
     }
 
     @GetMapping("/path/like/{name}")
-    private Flux<Project> findProjectsByPath(@PathVariable String path) {
+    private Flux<IProject> findProjectsByPath(@PathVariable String path) {
         return projectManager.findProject(ProjectMatchers.matcherPath(path));
     }
 
     private static class ProjectMatchers {
         public static Matcher matchName(String name) {
-            return new BaseMatcher<Project>() {
+            return new BaseMatcher<IProject>() {
                 @Override
                 public boolean matches(Object o) {
-                    Project project = (Project)o;
+                    IProject project = (IProject)o;
                     return project.getName().toLowerCase().contains(name.toLowerCase());
                 }
 
@@ -67,11 +77,25 @@ public class ProjectController {
         }
 
         public static Matcher matcherPath(String path) {
-            return new BaseMatcher<Project>() {
+            return new BaseMatcher<IProject>() {
                 @Override
                 public boolean matches(Object o) {
-                    Project project = (Project)o;
+                    IProject project = (IProject)o;
                     return project.getPath().toAbsolutePath().toString().toLowerCase().contains(path.toLowerCase());
+                }
+
+                @Override
+                public void describeTo(Description description) {
+
+                }
+            };
+        }
+
+        public static Matcher matchAny() {
+            return new BaseMatcher<IProject>() {
+                @Override
+                public boolean matches(Object o) {
+                    return true;
                 }
 
                 @Override

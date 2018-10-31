@@ -8,7 +8,7 @@ import java.util.Iterator;
  */
 public interface SimilarityGraphicNode {
 
-    Iterator<SimilarityGraphicNode> getSimilarNodes(float threshold);
+    Iterable<SimilarityGraphicNode> getSimilarNodes(float threshold);
 
     Path getFile();
 }

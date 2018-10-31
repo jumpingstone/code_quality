@@ -30,7 +30,7 @@ public class SimilarityCalculatorManager {
         visitedMap.add(file);
 
         Iterator<SimilarityGraphicNode> nodeIterator = network.getNodes();
-        visit(newNode, network, visitedMap, nodeIterator);
+        visit(file, newNode, network, visitedMap, nodeIterator);
     }
 
     private void visit(Path file, SimilarityGraphicNode newNode,

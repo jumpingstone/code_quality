@@ -1,4 +1,4 @@
-package com.jumpingstone.codequality.fireeye.persistent;
+package com.jumpingstone.codequality.fireeye.neo4j;
 
 import com.jumpingstone.codequality.fireeye.FileSimilarityGraphic;
 import com.jumpingstone.codequality.fireeye.SimilarityGraphicNode;
@@ -7,7 +7,6 @@ import com.jumpingstone.codequality.fireeye.graphic.PropertyNames;
 import org.neo4j.graphdb.*;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Iterator;
 
 /**
@@ -61,25 +60,4 @@ public class GraphicDBSimilarityService implements FileSimilarityGraphic {
         relationship.setProperty(PropertyNames.SIMILARITY, similarity);
     }
 
-    public class GraphicFileNode implements SimilarityGraphicNode {
-        private final Node node;
-
-        public GraphicFileNode(Node node) {
-            this.node = node;
-        }
-
-        @Override
-        public Iterator<SimilarityGraphicNode> getSimilarNodes(float threshold) {
-            return null;
-        }
-
-        @Override
-        public Path getFile() {
-            return (Path) node.getProperty(PropertyNames.FILE_NAME);
-        }
-    }
-
-    enum NodeRelationships implements RelationshipType {
-        Similar
-    }
 }

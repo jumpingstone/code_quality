@@ -1,5 +1,7 @@
-package com.jumpingstone.codequality.fireeye.service;
+package com.jumpingstone.codequality.fireeye.service.impl;
 
+import com.jumpingstone.codequality.fireeye.service.SimilarityResponse;
+import com.jumpingstone.codequality.fireeye.service.SimilarityService;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
