@@ -76,7 +76,7 @@ public class ScanTask implements Callable<Void> {
                 });
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         }
         progressMonitor.done();
         return null;
