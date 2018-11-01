@@ -36,7 +36,7 @@ import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 
 const drawerWidth = 240;
-const API_URL = 'http://localhost:9999';
+const API_URL = 'http://localhost:9000';
 
 const styles = theme => ({
   root: {

@@ -6,6 +6,7 @@ import com.jumpingstone.codequality.fireeye.model.IProject;
 import com.jumpingstone.codequality.fireeye.service.ProjectService;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
 import org.hamcrest.Matcher;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -13,6 +14,7 @@ import java.io.File;
 import java.nio.file.Paths;
 import java.util.List;
 
+@Service
 public class ProjectServiceImpl implements ProjectService {
 
     ProjectManager projectManager = new ObjectFactory().createProjectManager(System.getProperty("user.home") +

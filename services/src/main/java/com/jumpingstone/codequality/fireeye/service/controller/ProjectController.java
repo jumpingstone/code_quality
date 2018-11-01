@@ -44,7 +44,7 @@ public class ProjectController {
         return count;
     }
 
-    @GetMapping("/count/name/like/{name}")
+    @GetMapping("/count/path/like/{name}")
     private Integer countProjectPath(@PathVariable String path) {
         int count = projectManager.countProject(ProjectMatchers.matcherPath(path));
         return count;
