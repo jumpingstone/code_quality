@@ -4,6 +4,8 @@ import com.jumpingstone.codequality.fireeye.cals.SimilarityCalculatorManager;
 import com.jumpingstone.codequality.fireeye.model.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.util.stream.Stream;
  * Created by chenwei on 2018/10/31.
  */
 public class ScanTask implements Callable<Void> {
+    private final Logger logger = LoggerFactory.getLogger(ScanTask.class);
 
     private final IProject project;
     private final FileSimilarityGraphic graphicDB;
@@ -60,7 +63,10 @@ public class ScanTask implements Callable<Void> {
                 Files.walkFileTree(sourceDir, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        if (file.endsWith(".java")) {
+                        if (file.toString().endsWith(".java")) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("analyze file: " + file.toString());
+                            }
                             monitor.setTaskName("analyze file: " + file.toString());
                             calculatorManager.updateSimilarity(graphicDB, file);
                             monitor.worked(1);
