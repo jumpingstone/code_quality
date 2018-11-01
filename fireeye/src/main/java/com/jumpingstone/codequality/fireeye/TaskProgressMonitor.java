@@ -10,6 +10,7 @@ public class TaskProgressMonitor implements IProgressMonitor {
     private double totalWork = 10000000;
     private double doneWork = 0;
     private boolean cancel = false;
+    private boolean isDone = false;
 
     @Override
     public void beginTask(String msg, int totalWork) {
@@ -20,6 +21,11 @@ public class TaskProgressMonitor implements IProgressMonitor {
     @Override
     public void done() {
         doneWork = totalWork;
+        isDone = true;
+    }
+
+    public boolean finished() {
+        return isDone;
     }
 
     @Override
@@ -53,6 +59,10 @@ public class TaskProgressMonitor implements IProgressMonitor {
         if (doneWork > totalWork) {
             done();
         }
+    }
+
+    public int getPercentage() {
+        return (int) (100 * doneWork / totalWork);
     }
 
     public String getContent() {

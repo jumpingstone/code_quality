@@ -3,6 +3,9 @@ package com.jumpingstone.codequality.fireeye.cals;
 import com.jumpingstone.codequality.fireeye.FileSimilarityGraphic;
 import com.jumpingstone.codequality.fireeye.SimilarityCalculator;
 import com.jumpingstone.codequality.fireeye.SimilarityGraphicNode;
+import com.jumpingstone.codequality.fireeye.neo4j.GraphicDBSimilarityService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -12,6 +15,7 @@ import java.util.*;
  * Created by chenwei on 2018/10/28.
  */
 public class SimilarityCalculatorManager {
+    private final Logger logger = LoggerFactory.getLogger(SimilarityCalculatorManager.class);
 
     private List<SimilarityCalculator> calculatorList = new ArrayList<>();
     private IScoreAggregator aggregator = Aggregators.AVG;
@@ -43,8 +47,11 @@ public class SimilarityCalculatorManager {
             if (!visitedMap.contains(fileToCompare)) {
                 visitedMap.add(fileToCompare);
 
+                logger.info("calculate similarity of two files : " + file + " <<--->> " + fileToCompare);
                 float similarity = calculate(fileToCompare, file);
+                logger.info("calculate file similarity result = " + similarity);
                 if (similarity > 0.3) {
+                    logger.info("update file similarity");
                     network.updateSimilarity(newNode, node, similarity);
 
                     Iterator<SimilarityGraphicNode> similarNodes = node.getSimilarNodes(0.8f).iterator();

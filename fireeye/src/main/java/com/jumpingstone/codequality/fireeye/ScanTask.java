@@ -38,7 +38,7 @@ public class ScanTask implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         ObjectFactory objectFactory = new ObjectFactory();
         final SimilarityCalculatorManager calculatorManager = objectFactory.createCalculator();
         Collection<Path> sourceDirs = null;

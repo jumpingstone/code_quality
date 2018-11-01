@@ -5,7 +5,7 @@ import org.neo4j.graphdb.RelationshipType;
 /**
  * Created by chenwei on 2018/10/31.
  */
-enum NodeRelationships implements RelationshipType {
+public enum NodeRelationships implements RelationshipType {
     Similar,
     Contains
 }

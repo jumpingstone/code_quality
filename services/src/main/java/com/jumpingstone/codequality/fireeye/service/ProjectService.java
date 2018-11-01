@@ -1,6 +1,7 @@
 package com.jumpingstone.codequality.fireeye.service;
 
 import com.jumpingstone.codequality.fireeye.model.IProject;
+import com.jumpingstone.codequality.fireeye.model.ManagedProject;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
 import org.hamcrest.Matcher;
 import reactor.core.publisher.Flux;
@@ -15,6 +16,6 @@ public interface ProjectService {
 
     Mono<IProject> getProject(String project_id);
 
-    Mono<IProject> scanProject(String project_id);
+    Mono<ManagedProject> scanProject(String project_id);
 
 }

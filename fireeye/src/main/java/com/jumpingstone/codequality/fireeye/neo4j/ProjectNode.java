@@ -13,19 +13,22 @@ import java.nio.file.Paths;
 public class ProjectNode implements IProject {
 
     private final Node node;
+    private final String name;
+    private final Path path;
 
     public ProjectNode(Node node) {
         this.node = node;
+        name = (String) node.getProperty(PropertyNames.PROJECT_NAME);
+        path = Paths.get((String) node.getProperty(PropertyNames.PATH));
     }
 
     @Override
     public String getName() {
-        return (String) node.getProperty(PropertyNames.PROJECT_NAME);
+        return name;
     }
 
     @Override
     public Path getPath() {
-        String path = (String) node.getProperty(PropertyNames.PATH);
-        return Paths.get(path);
+        return path;
     }
 }

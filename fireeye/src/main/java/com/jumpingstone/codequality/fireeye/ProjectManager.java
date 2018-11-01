@@ -3,35 +3,37 @@ package com.jumpingstone.codequality.fireeye;
 import com.jumpingstone.codequality.fireeye.graphic.GraphicLabels;
 import com.jumpingstone.codequality.fireeye.graphic.PropertyNames;
 import com.jumpingstone.codequality.fireeye.model.IProject;
+import com.jumpingstone.codequality.fireeye.model.ManagedProject;
+import com.jumpingstone.codequality.fireeye.model.Similarity;
+import com.jumpingstone.codequality.fireeye.neo4j.GraphicFileNode;
+import com.jumpingstone.codequality.fireeye.neo4j.NodeRelationships;
 import com.jumpingstone.codequality.fireeye.neo4j.ProjectNode;
 import com.jumpingstone.codequality.fireeye.neo4j.GraphicDBSimilarityService;
 import org.hamcrest.Matcher;
-import org.neo4j.graphdb.GraphDatabaseService;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.ResourceIterator;
-import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.*;
 import org.neo4j.graphdb.factory.GraphDatabaseFactory;
 import org.neo4j.kernel.configuration.BoltConnector;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class ProjectManager {
 
     private final Path projectDataBasePath;
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
-    private final ConcurrentHashMap<IProject, Future<Void>> taskMap = new ConcurrentHashMap();
+    private final ConcurrentHashMap<IProject, TaskProgressMonitor> taskMap = new ConcurrentHashMap();
     private final ObjectFactory objectFactory;
     private final Path codeBasePath;
     private GraphDatabaseService projectGraphicDatabase;
-    private GraphicDBSimilarityService similarityService;
 
     public ProjectManager(final Path databaseMainDirectory, final Path codeBasePath,
                           final ObjectFactory objectFactory) {
@@ -40,30 +42,66 @@ public class ProjectManager {
         this.objectFactory = objectFactory;
         this.projectGraphicDatabase = createGraphicDB(projectDataBasePath.toAbsolutePath().toString(),
                 7678);
-        this.similarityService = new GraphicDBSimilarityService(projectGraphicDatabase);
     }
 
     public IProject getProject(String project_id) {
         try (Transaction tx = projectGraphicDatabase.beginTx()) {
             Node node = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
                     project_id);
-            return node == null ? null : new ProjectNode(node);
+            ProjectNode projectNode = node == null ? null : new ProjectNode(node);
+            tx.success();
+            return projectNode;
         }
     }
 
     public List<IProject> findProject(Matcher<IProject> matcher) {
         try (Transaction tx = projectGraphicDatabase.beginTx()){
             ResourceIterator<Node> nodes = projectGraphicDatabase.findNodes(GraphicLabels.Project);
-            return nodes.stream().filter(node -> matcher.matches(node)).map(
+            List<IProject> projects = nodes.stream().filter(node -> matcher.matches(node)).map(
                 node -> (IProject) (new ProjectNode(node))).collect(Collectors.toList());
+            tx.success();
+            return projects;
         }
+    }
+
+    public Set<Similarity> findSimilarityFiles(String project_id, Float threshold) {
+        Set<Similarity> similarities = new HashSet<>();
+        try (Transaction tx = projectGraphicDatabase.beginTx()){
+            Node projectNode = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
+                    project_id);
+            if (projectNode != null) {
+                for(Relationship r : projectNode.getRelationships(NodeRelationships.Contains) ){
+                    Node fileNode = r.getOtherNode(projectNode);
+                    searchFileSimilarity(threshold, similarities, fileNode);
+                }
+            }
+            tx.success();
+        }
+        return similarities;
+    }
+
+    public Set<Similarity> findSimilarityFiles(String project_id, Integer file_id, Float threshold) {
+        Set<Similarity> similarities = new HashSet<>();
+        try (Transaction tx = projectGraphicDatabase.beginTx()){
+            ResourceIterator<Node> fileNodes = projectGraphicDatabase.findNodes(GraphicLabels.Java_File,
+                            PropertyNames.PROJECT_NAME, project_id,
+                            PropertyNames.PATH, file_id);
+            if (fileNodes != null && fileNodes.hasNext()) {
+                Node fileNode = fileNodes.next();
+                searchFileSimilarity(threshold, similarities, fileNode);
+            }
+            tx.success();
+        }
+        return similarities;
     }
 
     public IProject getProjectByPath(String path) {
         try (Transaction tx = projectGraphicDatabase.beginTx()) {
             Node node = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PATH,
                     path);
-            return node == null ? null : new ProjectNode(node);
+            ProjectNode projectNode = node == null ? null : new ProjectNode(node);
+            tx.success();
+            return projectNode;
         }
     }
 
@@ -81,6 +119,7 @@ public class ProjectManager {
                      node.setProperty(PropertyNames.PROJECT_NAME, name);
                      node.setProperty(PropertyNames.PATH, path);
                      project = new ProjectNode(node);
+                     tx.success();
                  } else {
                      throw new IllegalArgumentException("project already exist");
                  }
@@ -91,21 +130,37 @@ public class ProjectManager {
         }
     }
 
-    public IProject scanProject(String name) {
+    public ManagedProject scanProject(String name) {
         IProject project = getProject(name);
+        TaskProgressMonitor monitor = null;
         if (project != null) {
             //check if we have the scan project task in queue.
-            if (!taskMap.contains(project)) {
-                TaskProgressMonitor monitor = new TaskProgressMonitor();
-                taskMap.put(project,
-                        executor.submit(new ScanTask(similarityService, project, monitor)));
+            if (!taskMap.contains(project) || taskMap.get(project).isCanceled()
+                    || taskMap.get(project).finished()) {
+                monitor = new TaskProgressMonitor();
+                taskMap.put(project, monitor);
+                executor.submit(new ScanTask(new GraphicDBSimilarityService(project, projectGraphicDatabase), project, monitor));
+            } else {
+                monitor = taskMap.get(project);
             }
         }
-        return project;
+        return new ManagedProject(project, monitor);
     }
 
     private void restoreProject(Node node) {
 
+    }
+
+    private void searchFileSimilarity(Float threshold, Set<Similarity> similarities, Node fileNode) {
+        for (Relationship similarity : fileNode.getRelationships(Direction.BOTH, NodeRelationships.Similar)) {
+            Float s = (Float) similarity.getProperty(PropertyNames.SIMILARITY);
+            if (s > threshold) {
+                similarities.add(new Similarity(
+                        new GraphicFileNode(projectGraphicDatabase, fileNode),
+                        new GraphicFileNode(projectGraphicDatabase, similarity.getOtherNode(fileNode)),
+                        s));
+            }
+        }
     }
 
     private GraphDatabaseService createGraphicDB(String graphicDBDirectory, int port) {

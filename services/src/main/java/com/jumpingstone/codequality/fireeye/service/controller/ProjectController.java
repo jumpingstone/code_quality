@@ -1,6 +1,7 @@
 package com.jumpingstone.codequality.fireeye.service.controller;
 
 import com.jumpingstone.codequality.fireeye.model.IProject;
+import com.jumpingstone.codequality.fireeye.model.ManagedProject;
 import com.jumpingstone.codequality.fireeye.service.ProjectService;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
 import org.hamcrest.BaseMatcher;
@@ -24,7 +25,7 @@ public class ProjectController {
     }
 
     @PostMapping("/scan/{project_id}")
-    private Mono<IProject> scanProject(@PathVariable String project_id) {
+    private Mono<ManagedProject> scanProject(@PathVariable String project_id) {
         return projectManager.scanProject(project_id);
     }
 

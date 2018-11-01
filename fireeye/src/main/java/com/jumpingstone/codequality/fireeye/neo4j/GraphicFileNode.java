@@ -2,11 +2,10 @@ package com.jumpingstone.codequality.fireeye.neo4j;
 
 import com.jumpingstone.codequality.fireeye.SimilarityGraphicNode;
 import com.jumpingstone.codequality.fireeye.graphic.PropertyNames;
-import org.neo4j.graphdb.Direction;
-import org.neo4j.graphdb.Node;
-import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.*;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,31 +15,42 @@ import java.util.Set;
 public class GraphicFileNode implements SimilarityGraphicNode {
 
     private final Node node;
+    private final Path file;
+    private final GraphDatabaseService db;
 
-    public GraphicFileNode(Node node) {
+
+    public GraphicFileNode(GraphDatabaseService graphicDB, Node node) {
+        this.db = graphicDB;
         this.node = node;
-    }
-
-    public Node getNode() {
-        return node;
+        this.file = Paths.get((String) node.getProperty(PropertyNames.PATH));
     }
 
     @Override
     public Iterable<SimilarityGraphicNode> getSimilarNodes(float threshold) {
-        Iterable<Relationship> relationships =
-                node.getRelationships(NodeRelationships.Similar, Direction.BOTH);
         Set<SimilarityGraphicNode> nodeList = new HashSet<>();
 
-        for (Relationship relationship:relationships) {
-            if ((Float)(relationship.getProperty(PropertyNames.SIMILARITY)) > threshold) {
-                nodeList.add(new GraphicFileNode(relationship.getEndNode()));
+        try (Transaction tx = db.beginTx()) {
+            Iterable<Relationship> relationships =
+                    node.getRelationships(NodeRelationships.Similar, Direction.BOTH);
+
+            for (Relationship relationship : relationships) {
+                if ((Float) (relationship.getProperty(PropertyNames.SIMILARITY)) > threshold) {
+                    nodeList.add(new GraphicFileNode(db, relationship.getEndNode()));
+                }
             }
+            tx.success();
         }
+
         return nodeList;
     }
 
     @Override
     public Path getFile() {
-        return (Path) node.getProperty(PropertyNames.PATH);
+        return file;
     }
+
+    Node getNode() {
+        return node;
+    }
+
 }
