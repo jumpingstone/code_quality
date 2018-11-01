@@ -47,7 +47,7 @@ public class SimilarityCalculatorManager {
                 if (similarity > 0.3) {
                     network.updateSimilarity(newNode, node, similarity);
 
-                    Iterator<SimilarityGraphicNode> similarNodes = node.getSimilarNodes(0.8f);
+                    Iterator<SimilarityGraphicNode> similarNodes = node.getSimilarNodes(0.8f).iterator();
                     visit(file, newNode, network, visitedMap, similarNodes);
                 }
             }

@@ -14,10 +14,15 @@ import java.util.Set;
  * Created by chenwei on 2018/10/31.
  */
 public class GraphicFileNode implements SimilarityGraphicNode {
+
     private final Node node;
 
     public GraphicFileNode(Node node) {
         this.node = node;
+    }
+
+    public Node getNode() {
+        return node;
     }
 
     @Override
