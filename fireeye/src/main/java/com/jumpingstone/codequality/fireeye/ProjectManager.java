@@ -41,22 +41,27 @@ public class ProjectManager {
     }
 
     public IProject getProject(String project_id) {
-        Node node = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
-                project_id);
-        return node== null? null : new ProjectNode(node);
+        try (Transaction tx = projectGraphicDatabase.beginTx()) {
+            Node node = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
+                    project_id);
+            return node == null ? null : new ProjectNode(node);
+        }
     }
 
-
     public List<IProject> findProject(Matcher<IProject> matcher) {
-        ResourceIterator<Node> nodes = projectGraphicDatabase.findNodes(GraphicLabels.Project);
-        return nodes.stream().filter(node -> matcher.matches(node)).map(
-                node -> (IProject)(new ProjectNode(node))).collect(Collectors.toList());
+        try (Transaction tx = projectGraphicDatabase.beginTx()){
+            ResourceIterator<Node> nodes = projectGraphicDatabase.findNodes(GraphicLabels.Project);
+            return nodes.stream().filter(node -> matcher.matches(node)).map(
+                node -> (IProject) (new ProjectNode(node))).collect(Collectors.toList());
+        }
     }
 
     public IProject getProjectByPath(String path) {
-        Node node = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PATH,
-                path);
-        return node== null? null : new ProjectNode(node);
+        try (Transaction tx = projectGraphicDatabase.beginTx()) {
+            Node node = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PATH,
+                    path);
+            return node == null ? null : new ProjectNode(node);
+        }
     }
 
     public IProject createProject(String name, Path projectPath) {
