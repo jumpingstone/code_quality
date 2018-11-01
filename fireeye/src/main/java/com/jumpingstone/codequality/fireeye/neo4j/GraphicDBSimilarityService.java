@@ -59,11 +59,14 @@ public class GraphicDBSimilarityService implements FileSimilarityGraphic {
 
     @Override
     public Iterable<SimilarityGraphicNode> getNodes() {
+        try (Transaction tx = graphicDB.beginTx()) {
             ResourceIterator<Node> nodeIterator = graphicDB.findNodes(GraphicLabels.Java_File,
                     PropertyNames.PROJECT_NAME, project.getName());
-            List<SimilarityGraphicNode> nodes = nodeIterator.stream().map( n -> new GraphicFileNode(graphicDB, n)).
+            List<SimilarityGraphicNode> nodes = nodeIterator.stream().map(n -> new GraphicFileNode(graphicDB, n)).
                     collect(Collectors.toList());
+            tx.success();
             return nodes;
+        }
     }
 
     @Override
