@@ -29,11 +29,14 @@ public class ProjectManager {
     private final ExecutorService executor = Executors.newFixedThreadPool(2);
     private final ConcurrentHashMap<IProject, Future<Void>> taskMap = new ConcurrentHashMap();
     private final ObjectFactory objectFactory;
+    private final Path codeBasePath;
     private GraphDatabaseService projectGraphicDatabase;
     private GraphicDBSimilarityService similarityService;
 
-    public ProjectManager(final Path databaseMainDirectory, final ObjectFactory objectFactory) {
+    public ProjectManager(final Path databaseMainDirectory, final Path codeBasePath,
+                          final ObjectFactory objectFactory) {
         this.projectDataBasePath = databaseMainDirectory;
+        this.codeBasePath = codeBasePath;
         this.objectFactory = objectFactory;
         this.projectGraphicDatabase = createGraphicDB(projectDataBasePath.toAbsolutePath().toString(),
                 7678);
@@ -71,11 +74,12 @@ public class ProjectManager {
         }
         if (Files.isDirectory(projectPath)) {
             try (Transaction tx = projectGraphicDatabase.beginTx()) {
+                String path =  projectPath.toAbsolutePath().toString();
                  if (projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME, name) == null
-                         && projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PATH, projectPath) == null ) {
+                         && projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PATH, path) == null ) {
                      Node node = projectGraphicDatabase.createNode(GraphicLabels.Project);
                      node.setProperty(PropertyNames.PROJECT_NAME, name);
-                     node.setProperty(PropertyNames.PATH, projectPath);
+                     node.setProperty(PropertyNames.PATH, path);
                      project = new ProjectNode(node);
                  } else {
                      throw new IllegalArgumentException("project already exist");
@@ -92,8 +96,9 @@ public class ProjectManager {
         if (project != null) {
             //check if we have the scan project task in queue.
             if (!taskMap.contains(project)) {
+                TaskProgressMonitor monitor = new TaskProgressMonitor();
                 taskMap.put(project,
-                        executor.submit(new ScanTask(similarityService, project)));
+                        executor.submit(new ScanTask(similarityService, project, monitor)));
             }
         }
         return project;

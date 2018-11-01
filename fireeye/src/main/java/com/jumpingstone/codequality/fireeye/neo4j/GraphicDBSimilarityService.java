@@ -22,14 +22,14 @@ public class GraphicDBSimilarityService implements FileSimilarityGraphic {
     @Override
     public SimilarityGraphicNode createNode(Path file) {
         Node node = graphicDB.createNode(GraphicLabels.Java_File);
-        node.setProperty(PropertyNames.PATH, file.getFileName());
+        node.setProperty(PropertyNames.PATH, file.toAbsolutePath().toString());
         return new GraphicFileNode(node);
     }
 
     @Override
     public SimilarityGraphicNode getNode(Path file) {
         GraphicFileNode fileNode = null;
-        Node node = graphicDB.findNode(GraphicLabels.Java_File, PropertyNames.PATH, file.getFileName());
+        Node node = graphicDB.findNode(GraphicLabels.Java_File, PropertyNames.PATH, file.toAbsolutePath().toString());
         if (node != null) {
             fileNode = new GraphicFileNode(node);
         }

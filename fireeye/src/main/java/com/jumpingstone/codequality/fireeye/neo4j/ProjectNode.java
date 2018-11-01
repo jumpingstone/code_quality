@@ -5,6 +5,7 @@ import com.jumpingstone.codequality.fireeye.model.IProject;
 import org.neo4j.graphdb.Node;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by chenwei on 2018/10/31.
@@ -24,6 +25,7 @@ public class ProjectNode implements IProject {
 
     @Override
     public Path getPath() {
-        return (Path) node.getProperty(PropertyNames.PATH);
+        String path = (String) node.getProperty(PropertyNames.PATH);
+        return Paths.get(path);
     }
 }

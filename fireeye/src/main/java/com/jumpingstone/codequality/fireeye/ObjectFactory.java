@@ -12,8 +12,8 @@ import java.nio.file.Paths;
  */
 public class ObjectFactory {
 
-    public ProjectManager createProjectManager(String dbPath) {
-        return new ProjectManager(Paths.get(dbPath), this);
+    public ProjectManager createProjectManager(String dbPath, String codeBasePath) {
+        return new ProjectManager(Paths.get(dbPath), Paths.get(codeBasePath), this);
     }
 
     public SimilarityCalculatorManager createCalculator() {
