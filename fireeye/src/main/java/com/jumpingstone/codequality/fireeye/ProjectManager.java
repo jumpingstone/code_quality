@@ -17,10 +17,7 @@ import org.neo4j.kernel.configuration.BoltConnector;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -70,10 +67,31 @@ public class ProjectManager {
             Node projectNode = projectGraphicDatabase.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
                     project_id);
             if (projectNode != null) {
+
+                Map<String, Object> params = new HashMap<>();
+                params.put("threshold", threshold);
+                params.put("project_id", project_id);
+                Result result = projectGraphicDatabase.execute("MATCH (n:Java_File)-[s:Similar]->(m:Java_File) " +
+                        "WHERE s.Similarity > $threshold "  +
+                        "WHERE n.Project_Name=$project_id " +
+                        "WHERE m.Project_Name=$project_id " +
+                        "RETURN n,m,s.Similarity",
+                        params
+                );
+                while ( result.hasNext() )
+                {
+                    Map<String,Object> row = result.next();
+                    for ( Map.Entry<String,Object> column : row.entrySet() )
+                    {
+                        System.out.println(column.getKey() + ": " + column.getValue());
+                    }
+                }
+
                 for(Relationship r : projectNode.getRelationships(NodeRelationships.Contains) ){
                     Node fileNode = r.getOtherNode(projectNode);
                     searchFileSimilarity(threshold, similarities, fileNode);
                 }
+
             }
             tx.success();
         }

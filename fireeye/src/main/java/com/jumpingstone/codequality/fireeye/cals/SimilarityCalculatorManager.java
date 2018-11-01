@@ -69,7 +69,7 @@ public class SimilarityCalculatorManager {
             try {
                 score = c.calculate(file, fileToCompare);
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error(e.getMessage(), e);
             }
             scores.put(c.getClass(), score);
         });
