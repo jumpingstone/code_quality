@@ -12,7 +12,7 @@ public interface FileSimilarityGraphic {
 
     SimilarityGraphicNode getNode(Path file);
 
-    Iterator<SimilarityGraphicNode> getNodes();
+    Iterable<SimilarityGraphicNode> getNodes();
 
     void updateSimilarity(SimilarityGraphicNode newNode, SimilarityGraphicNode node, float similarity);
 }

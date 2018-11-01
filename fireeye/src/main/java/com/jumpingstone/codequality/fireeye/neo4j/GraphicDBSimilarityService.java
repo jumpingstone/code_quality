@@ -10,7 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by chenwei on 2018/10/30.
@@ -55,19 +58,12 @@ public class GraphicDBSimilarityService implements FileSimilarityGraphic {
     }
 
     @Override
-    public Iterator<SimilarityGraphicNode> getNodes() {
-        ResourceIterator<Node> nodeIterator = graphicDB.getAllNodes().iterator();
-        return new Iterator<SimilarityGraphicNode>() {
-            @Override
-            public boolean hasNext() {
-                return nodeIterator.hasNext();
-            }
-
-            @Override
-            public SimilarityGraphicNode next() {
-                return new GraphicFileNode(graphicDB, nodeIterator.next());
-            }
-        };
+    public Iterable<SimilarityGraphicNode> getNodes() {
+            ResourceIterator<Node> nodeIterator = graphicDB.findNodes(GraphicLabels.Java_File,
+                    PropertyNames.PROJECT_NAME, project.getName());
+            List<SimilarityGraphicNode> nodes = nodeIterator.stream().map( n -> new GraphicFileNode(graphicDB, n)).
+                    collect(Collectors.toList());
+            return nodes;
     }
 
     @Override
