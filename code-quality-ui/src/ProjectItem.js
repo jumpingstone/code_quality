@@ -52,7 +52,7 @@ class ProjectItem extends Component {
 
     showResult() {
         console.log("in do showResult");
-        postData(API_URL + '/similarity/' + this.state.project.name + '/0.3')
+        fetch(API_URL + '/similarity/' + this.state.project.name + '/0.3')
             .then(response => {
                 if (!response.ok) { throw response }
                 return response.json()
