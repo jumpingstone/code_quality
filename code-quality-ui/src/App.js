@@ -21,12 +21,14 @@ import AddIcon from '@material-ui/icons/Add';
 import EditIcon from '@material-ui/icons/Edit';
 import Icon from '@material-ui/core/Icon';
 import DeleteIcon from '@material-ui/icons/Delete';
+import ScanIcon from '@material-ui/icons/PlayCircleFilled';
 import NavigationIcon from '@material-ui/icons/Navigation';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
 import ListSubheader from '@material-ui/core/ListSubheader';
 import DashboardIcon from '@material-ui/icons/Dashboard';
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
@@ -34,6 +36,9 @@ import PeopleIcon from '@material-ui/icons/People';
 import BarChartIcon from '@material-ui/icons/BarChart';
 import LayersIcon from '@material-ui/icons/Layers';
 import AssignmentIcon from '@material-ui/icons/Assignment';
+import ProgressIcon from '@material-ui/icons/Timelapse';
+import ReportIcon from '@material-ui/icons/BubbleChart';
+import CancelIcon from '@material-ui/icons/Cancel';
 
 const drawerWidth = 240;
 const API_URL = 'http://localhost:9000';
@@ -115,6 +120,23 @@ const styles = theme => ({
   },
 });
 
+function postData(url, data = {}) {
+  // Default options are marked with *
+    return fetch(url, {
+        method: "POST", // *GET, POST, PUT, DELETE, etc.
+        mode: "cors", // no-cors, cors, *same-origin
+        cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+        headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Accept": "application/json; charset=utf-8",
+            // "Content-Type": "application/x-www-form-urlencoded",
+        },
+        redirect: "follow", // manual, *follow, error
+        referrer: "no-referrer", // no-referrer, *client
+        body: JSON.stringify(data), // body data type must match "Content-Type" header
+    });
+}
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -122,14 +144,15 @@ class App extends Component {
     this.state = {
       isShow: false,
       open: true,
-      projects : []
+      projects: []
     };
 
   }
 
   componentDidMount() {
-      fetch(API_URL + '/projects').then(response => response.json)
-        .then(data => {this.setState({projects : data})});
+    fetch(API_URL + '/projects').
+       then(response => response.json())
+      .then(data => { console.log('setting state'); console.log(data); this.setState({ projects: data }) });
   }
 
   showTime = () => {
@@ -148,6 +171,7 @@ class App extends Component {
   render() {
     const isShow = this.state.isShow;
     const { classes } = this.props;
+    console.log('render state');
     if (!isShow) {
       return (
         <div className="App">
@@ -173,7 +197,7 @@ class App extends Component {
             className={classNames(classes.appBar, this.state.open && classes.appBarShift)}
           >
             <Toolbar disableGutters={!this.state.open} className={classes.toolbar}>
-            
+
               <IconButton
                 color="inherit"
                 aria-label="Open drawer"
@@ -224,56 +248,30 @@ class App extends Component {
             open={this.state.open}
           >
             <div className={classes.toolbarIcon}>
-            <div>
-              <Button  aria-label="Add" >
-                <AddIcon />
-              </Button>
-              <Button aria-label="Edit" className={classes.button}>
-                <EditIcon />
-              </Button>
-              <Button disabled aria-label="Delete" className={classes.button}>
-                <DeleteIcon />
-              </Button>
-            </div>
+              <div>
+                <Button aria-label="Add" >
+                  <AddIcon />
+                </Button>
+                <Button aria-label="Edit" className={classes.button}>
+                  <EditIcon />
+                </Button>
+                <Button disabled aria-label="Delete" className={classes.button}>
+                  <DeleteIcon />
+                </Button>
+              </div>
               <IconButton onClick={this.handleDrawerClose}>
                 <ChevronLeftIcon />
               </IconButton>
 
             </div>
             <Divider />
-            
+
             <Divider />
             <div>
-              <ListItem button>
-                <ListItemIcon>
-                  <DashboardIcon />
-                </ListItemIcon>
-                <ListItemText primary="Dashboard" />
-              </ListItem>
-              <ListItem button>
-                <ListItemIcon>
-                  <ShoppingCartIcon />
-                </ListItemIcon>
-                <ListItemText primary="Orders" />
-              </ListItem>
-              <ListItem button>
-                <ListItemIcon>
-                  <PeopleIcon />
-                </ListItemIcon>
-                <ListItemText primary="Customers" />
-              </ListItem>
-              <ListItem button>
-                <ListItemIcon>
-                  <BarChartIcon />
-                </ListItemIcon>
-                <ListItemText primary="Reports" />
-              </ListItem>
-              <ListItem button>
-                <ListItemIcon>
-                  <LayersIcon />
-                </ListItemIcon>
-                <ListItemText primary="Integrations" />
-              </ListItem>
+              {console.log(this.state.projects)}
+              {this.state.projects.map((project, i) => <ProjectItem key={i}
+                project={project} />)}
+
             </div>
           </Drawer>
           <main className={classes.content}>
@@ -299,4 +297,77 @@ class App extends Component {
 App.propTypes = {
   classes: PropTypes.object.isRequired,
 };
+
+class ProjectItem extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      project : this.props.project
+    };
+    this.doScan = this.doScan.bind(this);
+    this.cancelScan = this.cancelScan.bind(this);
+    this.showResult = this.showResult.bind(this);
+  }
+
+  doScan() {
+    console.log("in do scan");
+    postData(API_URL + '/projects/scan/' + this.state.project.name)
+    .then(response => {
+      if (!response.ok) { throw response }
+      return response.json()
+    })
+    .then(data => {
+      this.setState({
+        project: data
+      });
+    }) // JSON-string from `response.json()` call
+    .catch(error => console.error(error));
+  }
+
+  cancelScan() {
+
+  }
+
+  showResult() {
+
+  }
+
+  render() {
+    let actionIcon;
+    let actionText;
+    let actionHandler;
+
+    actionHandler = this.doScan
+    actionText = 'Scan';
+    actionIcon = <ScanIcon />
+
+    if (this.state.project.status === 'OnProgress') {
+      actionText = 'Cancel'
+      actionIcon = <CancelIcon />
+      actionHandler = this.cancelScan
+    } 
+
+    return (
+      <ListItem button>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary={this.state.project.name} />
+       
+          <ListItemSecondaryAction>
+            <IconButton aria-label={actionText} onClick={actionHandler}>
+              {actionIcon}
+            </IconButton>
+          </ListItemSecondaryAction>
+          <ListItemSecondaryAction>
+            <IconButton aria-label="Result" onClick={this.showResult}>
+            <ReportIcon/>
+            </IconButton>
+          </ListItemSecondaryAction>
+      </ListItem>
+    );
+  }
+}
 export default withStyles(styles)(App);

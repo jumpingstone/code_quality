@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="ExternalSystem" externalSystem="Maven" />
-  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/target/classes" />
     <output-test url="file://$MODULE_DIR$/target/test-classes" />
     <content url="file://$MODULE_DIR$">
@@ -84,7 +84,7 @@
     <orderEntry type="module-library">
       <library name="Maven: jdk.tools:jdk.tools:1.6">
         <CLASSES>
-          <root url="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_65.jdk/Contents/Home/lib/tools.jar!/" />
+          <root url="jar:///usr/java/sap_jvm8/lib/tools.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -119,7 +119,9 @@
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.7.0" level="project" />
     <orderEntry type="library" name="Maven: com.fasterxml.jackson.core:jackson-core:2.7.1" level="project" />
     <orderEntry type="library" name="Maven: io.github.lukehutch:fast-classpath-scanner:2.18.1" level="project" />
-    <orderEntry type="library" name="Maven: org.testng:testng:6.9.10" level="project" />
-    <orderEntry type="library" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.testng:testng:6.9.10" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.beanshell:bsh:2.0b4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.jmockit:jmockit:1.43" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: com.google.code.findbugs:jsr305:3.0.2" level="project" />
   </component>
 </module>

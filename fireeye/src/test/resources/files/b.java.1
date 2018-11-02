@@ -1,0 +1,231 @@
+package com.successfactors.ruleengine.gorule.service.impl;
+
+import com.successfactors.fo.api.bean.eo.IFoundationEO;
+import com.successfactors.genericobject.api.bean.GenericObject;
+import com.successfactors.logging.api.LogManager;
+import com.successfactors.logging.api.Logger;
+import com.successfactors.logging.api.ThreadContext;
+import com.successfactors.ruleengine.gorule.app.engine.impl.RuleCacheFactory;
+import com.successfactors.ruleengine.gorule.app.engine.impl.RulePreparation;
+import com.successfactors.ruleengine.gorule.bean.ExecutionStatus;
+import com.successfactors.ruleengine.gorule.bean.RuleExecutionResult;
+import com.successfactors.ruleengine.gorule.bean.RuntimeRule;
+import com.successfactors.ruleengine.gorule.bean.SFParserContext;
+import com.successfactors.ruleengine.gorule.service.AbstractRuleWithResultCommand;
+import com.successfactors.ruleengine.gorule.util.*;
+import com.successfactors.ruleengine.ruletrace.RuleTraceException;
+import com.successfactors.ruleengine.ruletrace.RuleTraceFactory;
+import com.successfactors.ruleengine.ruletrace.RuleTraceUtil;
+import com.successfactors.ruleengine.ruletrace.RuleTraceWriter;
+import com.successfactors.ruleengine.spi.dataloader.RuleDataCacheFactory;
+import com.successfactors.sca.ServiceApplicationException;
+import com.successfactors.sca.ServiceCommandImpl;
+
+import java.text.SimpleDateFormat;
+
+import static com.successfactors.ruleengine.gorule.service.impl.FireRuleWithResultImpl.EXECUTION_TIME;
+import static com.successfactors.ruleengine.gorule.service.impl.FireRuleWithResultImpl.SWITCH_RECORD_EXECUTION_TIME;
+
+public abstract class RuleExecutionImpl<T extends AbstractRuleWithResultCommand> implements ServiceCommandImpl<RuleExecutionResult, T> {
+
+    private final static Logger logger = LogManager.getLogger();
+
+    @Override
+    public RuleExecutionResult execute(T cmd) throws ServiceApplicationException {
+        PerformanceTimerFactory.clear(); //Reset all timers
+        //we need to enable in the SCA command scope and disable the batch log when it jump out the scope.
+        boolean previousState = RuleDataAuditLogUtil.enableBatchLog(true);
+        try {
+            return executeAndMeasureCommand(cmd);
+        } finally {
+            flushBatchLog(previousState);
+            clearCache(cmd);
+            PerformanceTimerFactory.clear();
+        }
+    }
+
+    protected RuleExecutionResult executeAndMeasureCommand(T cmd) throws ServiceApplicationException {
+        PerformanceMeasure timer = new PerformanceMeasure();
+
+        RuntimeRule runtimeRule = prepareRule(cmd);
+        timer.recordPreparationDuration();
+        RuleTraceWriter ruleTraceWriter = openRuleTraceIfRequired(cmd, runtimeRule.getCode());
+        traceBegin(cmd, runtimeRule, timer);
+        validateRule(cmd, runtimeRule);
+
+        RuleExecutionResult result = null;
+        try {
+            ThreadContext.put(REMessage.RULE_CODE, runtimeRule.getCode());
+            ThreadContext.put(RuleUtils.THREAD_CONTEXT_KEY_FOR_RULE_TRACE_FILTER_USER, RuleUtils.getRuleTraceFilterUser());
+            result = executeRule(cmd, runtimeRule, timer);
+        } finally {
+            ThreadContext.remove(REMessage.RULE_CODE);
+            ThreadContext.remove(RuleUtils.THREAD_CONTEXT_KEY_FOR_RULE_TRACE_FILTER_USER);
+            timer.stop();
+            measureExecutionDuration(timer, cmd);
+            traceEnd(cmd, runtimeRule, timer, result);
+            closeRuleTraceIfRequired(ruleTraceWriter, cmd);
+        }
+        return result;
+    }
+
+    protected void measureExecutionDuration(PerformanceMeasure timer, AbstractRuleWithResultCommand cmd) {
+        long executionDuration = timer.recordExecutionDuration();
+        Boolean durationSwitch = (Boolean) cmd.getSfParserContext().getExtraInfo().get(SWITCH_RECORD_EXECUTION_TIME);
+
+        if (durationSwitch != null && durationSwitch.booleanValue()) {
+            cmd.getSfParserContext().getExtraInfo().put(EXECUTION_TIME, executionDuration / 1000); //Execution end
+        }
+    }
+
+    protected abstract RuleExecutionResult executeRule(AbstractRuleWithResultCommand cmd, RuntimeRule runtimeRule, PerformanceMeasure timer) throws ServiceApplicationException;
+
+    protected abstract String getAction();
+
+    protected void traceEnd(AbstractRuleWithResultCommand cmd, RuntimeRule runtimeRule, PerformanceMeasure timer,
+                          RuleExecutionResult ruleExecutionResult) {
+        ExecutionStatus executionStatus;
+        if (ruleExecutionResult == null) {
+            executionStatus = new ExecutionStatus();
+            executionStatus.setStatus(ExecutionStatus.ExecutionStatusEnum.FAIL);
+        } else {
+            executionStatus = ruleExecutionResult.getExecutionStatus();
+        }
+
+
+        if (RuleTraceUtil.isTraceActivated()) {
+
+            ExecutionStatus.ExecutionStatusEnum status = executionStatus.getStatus();
+            RuleTraceUtil.trace(RuleTraceWriter.ACTION_END, "Rule '%s' executed with status '%s'. Duration: %s microseconds.",
+                    runtimeRule.getCode(), status, timer.getElapsedTime()); //Total time
+        }
+
+        RuleDataAuditLogUtil.logAtEndOfServiceCommand(timer.getPreparationDuration(),
+                timer.getExecutionDuration(),
+                timer.getElapsedTime(),
+                runtimeRule,
+                cmd.getSfParserContext().getRootObject(),
+                getClass(), executionStatus);
+    }
+
+    protected void traceBegin(AbstractRuleWithResultCommand cmd, RuntimeRule runtimeRule, PerformanceMeasure timer) {
+        if (RuleTraceUtil.isTraceActivated()) {
+            SFParserContext sfParserContext = cmd.getSfParserContext();
+            RuleTraceUtil.trace(RuleTraceWriter.ACTION_BEGIN, "%s rule '%s'. Effective date: %s. Base object: '%s': %s. Parameters: %s.",
+                    getAction(),
+                    runtimeRule.getCode(), new SimpleDateFormat("yyyy-MM-dd").format(sfParserContext.getEffectiveDate()),
+                    runtimeRule.getBaseObject(), new OutputHelper().toValue(runtimeRule.getBaseObject(), sfParserContext.getEffectiveDate()),
+                    sfParserContext.getParameterListForTrace(sfParserContext.getExtraInfo()));
+        }
+    }
+
+    private RuleTraceWriter openRuleTraceIfRequired(AbstractRuleWithResultCommand cmd,
+                                                    String ruleCode) throws ServiceApplicationException {
+        RuleTraceWriter ruleTraceWriter = null;
+
+        if (!cmd.isWithinBatch()) {
+            try {
+                ruleTraceWriter = RuleTraceFactory.getInstance().getRuleTraceWriter();
+                ruleTraceWriter.openTrace(ruleCode);
+            } catch (RuleTraceException e) {
+                throw new ServiceApplicationException(e);
+            }
+        }
+        return ruleTraceWriter;
+    }
+
+    private void validateRule(AbstractRuleWithResultCommand cmd, RuntimeRule runtimeRule) {
+        Object baseObject = cmd.getSfParserContext().getRootObject();
+        if (!(baseObject instanceof IFoundationEO) && baseObject instanceof GenericObject) {
+            String baseType = runtimeRule.getBaseObject();
+            String objectType = ((GenericObject) baseObject).getObjectType();
+            if (!baseType.equalsIgnoreCase(objectType)) {
+                logger.error(String.format("The baseObject's type '%s' is not same as baseType '%s'", objectType, baseType));
+            }
+        }
+    }
+
+
+    private RuntimeRule prepareRule(AbstractRuleWithResultCommand cmd) throws ServiceApplicationException {
+        RuntimeRule runtimeRule = cmd.getRuntimeRule();
+        if (runtimeRule == null) {
+            RulePreparation preparation = getRulePreparation(cmd);
+            if (cmd.getRule() != null) {
+                runtimeRule = preparation.getRuntimeRule();
+            } else {
+                runtimeRule = preparation.getRuntimeRule(cmd.getSfParserContext().getRuleEffectiveDate());
+            }
+        }
+        RuleUtils.addInfoToExtraInfo(cmd.getSfParserContext().getExtraInfo(), runtimeRule);
+        return runtimeRule;
+    }
+
+    private void clearCache(AbstractRuleWithResultCommand cmd) {
+        // Not within batch, manage cache by itself here.
+        if (!cmd.isWithinBatch()) {
+            RuleCacheFactory.getInstance().removeCurrentCache();
+            RuleDataCacheFactory.getInstance().removeCache();
+        }
+    }
+
+    private void closeRuleTraceIfRequired(RuleTraceWriter ruleTraceWriter, AbstractRuleWithResultCommand cmd) {
+        if (!cmd.isWithinBatch() && ruleTraceWriter != null) {
+            ruleTraceWriter.closeTrace();
+        }
+    }
+
+    private void flushBatchLog(boolean previousState) {
+        RuleDataAuditLogUtil.flushBatchLog(); // in order not to mess up logs from different executions, we flush it.
+        //previousState == false means it was turn on in this command.
+        if (!previousState) {
+            //it should be ONLY turn off in the scope in which it was turn on,
+            //so the the command was called by other command, it won't turn it off by mistake
+            //for example, A batch command turn the batch log on, the single command in the batch wouldn't
+            //flush or disable the batch log.
+            RuleDataAuditLogUtil.enableBatchLog(false);
+        }
+    }
+
+    private RulePreparation getRulePreparation(AbstractRuleWithResultCommand cmd) {
+        if (cmd.getRule() != null) {
+            return createRulePreparation(cmd.getRule());
+        }
+        if (cmd.getRuleExternalCode() != null) {
+            return createRulePreparation(cmd.getRuleExternalCode());
+        }
+        if (cmd.getRuleInternalId() != null) {
+            return createRulePreparation(cmd.getRuleInternalId());
+        }
+        logger.error("No rule, external code, or internal id passed to FireRuleWithResult");
+        throw new IllegalArgumentException("No rule, external code, or internal id passed to FireRuleWithResult");
+    }
+
+    // This method can be overwritten in test cases to allow passing
+    // a RulePreparation that uses a mocked CacheService.
+    protected RulePreparation createRulePreparation(Object ruleRef) {
+        return new RulePreparation(ruleRef);
+    }
+
+    static class PerformanceMeasure extends PerformanceTimer {
+        private long executionDuration;
+        private long preparationDuration;
+
+        public long recordExecutionDuration() {
+            this.executionDuration = getLapTime();
+            return executionDuration;
+        }
+
+        public long getExecutionDuration() {
+            return executionDuration;
+        }
+
+        public long recordPreparationDuration() {
+            this.preparationDuration = getLapTime();
+            return preparationDuration;
+        }
+
+        public long getPreparationDuration() {
+            return preparationDuration;
+        }
+    }
+}

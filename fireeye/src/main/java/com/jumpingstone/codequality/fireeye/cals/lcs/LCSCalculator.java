@@ -16,10 +16,12 @@ public class LCSCalculator implements SimilarityCalculator {
 
     @Override
     public float calculate(Path file, Path file2Compare) throws IOException {
-        logger.debug(String.format("calculate similarity of two files : %s and %s", file, file2Compare));
+        logger.debug(String.format("calculate similarity of two files :\n %s \n %s", file, file2Compare));
 
-        LineComparator left = new LineComparator(Files.readAllLines(file).toArray(new String[0]));
-        LineComparator right = new LineComparator(Files.readAllLines(file2Compare).toArray(new String[0]));
+        String[] lines1 = Files.readAllLines(file).toArray(new String[0]);
+        String[] lines2 = Files.readAllLines(file2Compare).toArray(new String[0]);
+        LineComparator left = new LineComparator(lines1);
+        LineComparator right = new LineComparator(lines2);
 
         RangeDifference[] differences = RangeDifferencer.findDifferences(left, right);
 
@@ -30,8 +32,8 @@ public class LCSCalculator implements SimilarityCalculator {
         int rightDiffLen = 0;
 
         for(RangeDifference d : differences) {
-            leftDiffLen += d.leftLength();
-            rightDiffLen += d.leftLength();
+            leftDiffLen += left.getRangeTextLength(d.leftStart(), d.leftEnd());
+            rightDiffLen += right.getRangeTextLength(d.rightStart(), d.rightEnd());
         }
 
         float leftCommonRange = (leftTotal - leftDiffLen) * 1.0f/leftTotal;

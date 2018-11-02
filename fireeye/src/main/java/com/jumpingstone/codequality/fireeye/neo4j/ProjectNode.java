@@ -6,6 +6,7 @@ import org.neo4j.graphdb.Node;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 
 /**
  * Created by chenwei on 2018/10/31.
@@ -30,5 +31,20 @@ public class ProjectNode implements IProject {
     @Override
     public Path getPath() {
         return path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ProjectNode that = (ProjectNode) o;
+        return Objects.equals(name, that.name) &&
+                Objects.equals(path, that.path);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(name, path);
     }
 }

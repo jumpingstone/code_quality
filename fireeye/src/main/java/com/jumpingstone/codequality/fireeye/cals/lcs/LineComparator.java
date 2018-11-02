@@ -38,6 +38,14 @@ class LineComparator implements IRangeComparator {
         return fLines.length;
     }
 
+    public int getRangeTextLength(int startLine, int endLine) {
+        int count = 0;
+        for(int i = startLine; i <= endLine; i++) {
+            count += fLines[i].length();
+        }
+        return count;
+    }
+
     @Override
     public boolean rangesEqual(int thisIndex, IRangeComparator other,
                                int otherIndex) {
@@ -49,6 +57,10 @@ class LineComparator implements IRangeComparator {
     @Override
     public boolean skipRangeComparison(int length, int maxLength, IRangeComparator other) {
         return false;
+    }
+
+    public int getTotalLineCount() {
+        return fLines.length;
     }
 
     public int getTotalCount() {

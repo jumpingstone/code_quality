@@ -47,7 +47,7 @@ public class SimilarityCalculatorManager {
             if (!visitedMap.contains(fileToCompare)) {
                 visitedMap.add(fileToCompare);
 
-                logger.info("calculate similarity of two files : " + file + " <<--->> " + fileToCompare);
+                logger.info("calculate similarity of two files : \n" + file + " <<--->> \n" + fileToCompare);
                 float similarity = calculate(fileToCompare, file);
                 logger.info("calculate file similarity result = " + similarity);
                 if (similarity > 0.3) {

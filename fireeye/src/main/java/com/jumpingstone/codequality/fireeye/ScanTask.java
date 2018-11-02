@@ -77,12 +77,13 @@ public class ScanTask implements Callable<Void> {
             }
         } catch (IOException e) {
             logger.error(e.getMessage(), e);
+            progressMonitor.setCanceled(true);
         }
         progressMonitor.done();
         return null;
     }
 
-    private Map<Path,Integer> calculatorEffort(Collection<Path> sourceDirs) throws IOException {
+    protected Map<Path,Integer> calculatorEffort(Collection<Path> sourceDirs) throws IOException {
         Map<Path,Integer> countmap = new HashMap<>();
         for(Path path : sourceDirs) {
             long count = Files.find(path, 20, (file, attr) -> Files.isRegularFile(file)

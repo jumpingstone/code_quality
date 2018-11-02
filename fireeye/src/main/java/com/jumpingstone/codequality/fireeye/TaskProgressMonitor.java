@@ -56,7 +56,7 @@ public class TaskProgressMonitor implements IProgressMonitor {
     @Override
     public void worked(int i) {
         doneWork += i;
-        if (doneWork > totalWork) {
+        if (doneWork >= totalWork) {
             done();
         }
     }

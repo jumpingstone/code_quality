@@ -13,6 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", methods={RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/projects")
 public class ProjectController {
 

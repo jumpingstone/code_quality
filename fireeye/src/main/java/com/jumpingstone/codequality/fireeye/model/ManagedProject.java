@@ -2,8 +2,9 @@ package com.jumpingstone.codequality.fireeye.model;
 
 import com.jumpingstone.codequality.fireeye.TaskProgressMonitor;
 
-public class ManagedProject {
+import java.nio.file.Path;
 
+public class ManagedProject implements IProject {
     private final IProject project;
     private final TaskProgressMonitor monitor;
 
@@ -12,8 +13,14 @@ public class ManagedProject {
         this.monitor = monitor;
     }
 
-    public IProject getProject() {
-        return project;
+    @Override
+    public String getName() {
+        return project.getName();
+    }
+
+    @Override
+    public Path getPath() {
+        return project.getPath();
     }
 
     public ProjectStatus getStatus() {
@@ -23,7 +30,7 @@ public class ManagedProject {
                 status = new ProjectStatus(ScanStatus.Canceled, monitor.getPercentage());
             } else if (monitor.finished()){
                 status = new ProjectStatus(ScanStatus.Finished, 100);
-            } else if (monitor.finished()){
+            } else {
                 status = new ProjectStatus(ScanStatus.OnProgress, monitor.getPercentage());
             }
         }

@@ -1,0 +1,11 @@
+<ListItem button>
+        <ListItemIcon>
+          <DashboardIcon />
+        </ListItemIcon>
+        <ListItemText primary={this.state.project.name} />
+        <ListItemSecondaryAction>
+                <IconButton aria-label="Scan" onClick={this.doScan}>
+                  <ScanIcon />
+                </IconButton>
+              </ListItemSecondaryAction>
+      </ListItem>
