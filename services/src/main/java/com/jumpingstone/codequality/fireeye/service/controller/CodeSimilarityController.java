@@ -4,15 +4,14 @@ package com.jumpingstone.codequality.fireeye.service.controller;
 import com.jumpingstone.codequality.fireeye.service.SimilarityResponse;
 import com.jumpingstone.codequality.fireeye.service.SimilarityService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000", methods={RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/similarity")
 public class CodeSimilarityController {
+
     @Autowired
     private SimilarityService similarityService;
 
