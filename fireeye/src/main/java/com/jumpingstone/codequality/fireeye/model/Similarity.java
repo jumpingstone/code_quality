@@ -20,8 +20,14 @@ public class Similarity {
         return fileNode.getFile();
     }
 
+    public Long getFileSize() {return fileNode.getSize();}
+
     public Path getPeer() {
         return otherFileNode.getFile();
+    }
+
+    public Long getPeerSize() {
+        return otherFileNode.getSize();
     }
 
     public Float getValue() {

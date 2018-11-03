@@ -4,6 +4,8 @@ import com.jumpingstone.codequality.fireeye.SimilarityGraphicNode;
 import com.jumpingstone.codequality.fireeye.graphic.PropertyNames;
 import org.neo4j.graphdb.*;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -16,13 +18,19 @@ public class GraphicFileNode implements SimilarityGraphicNode {
 
     private final Node node;
     private final Path file;
+    private long fileSize = 0;
     private final GraphDatabaseService db;
-
+    private float maxSimilarity = 0;
 
     public GraphicFileNode(GraphDatabaseService graphicDB, Node node) {
         this.db = graphicDB;
         this.node = node;
         this.file = Paths.get((String) node.getProperty(PropertyNames.PATH));
+        try {
+            this.fileSize = Files.size(this.file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -49,8 +57,20 @@ public class GraphicFileNode implements SimilarityGraphicNode {
         return file;
     }
 
+    @Override
+    public Long getSize() {
+        return fileSize;
+    }
+
     Node getNode() {
         return node;
     }
 
+    public float getMaxSimilarity() {
+        return maxSimilarity;
+    }
+
+    public void setMaxSimilarity(float maxSimilarity) {
+        this.maxSimilarity = maxSimilarity;
+    }
 }

@@ -73,24 +73,27 @@ public class ProjectManager {
                 params.put("project_id", project_id);
                 Result result = projectGraphicDatabase.execute("MATCH (n:Java_File)-[s:Similar]->(m:Java_File) " +
                         "WHERE s.Similarity > $threshold "  +
-                        "WHERE n.Project_Name=$project_id " +
-                        "WHERE m.Project_Name=$project_id " +
+                        "  AND n.Project_Name=$project_id " +
+                        "  AND m.Project_Name=$project_id " +
                         "RETURN n,m,s.Similarity",
                         params
                 );
                 while ( result.hasNext() )
                 {
                     Map<String,Object> row = result.next();
-                    for ( Map.Entry<String,Object> column : row.entrySet() )
-                    {
-                        System.out.println(column.getKey() + ": " + column.getValue());
-                    }
+                    Node fileNode = (Node) row.get("n");
+                    Node otherNode = (Node) row.get("m");
+                    Float similarity = (Float) row.get("s.Similarity");
+                    similarities.add(new Similarity(
+                            new GraphicFileNode(projectGraphicDatabase, fileNode),
+                            new GraphicFileNode(projectGraphicDatabase, otherNode),
+                            similarity));
                 }
-
-                for(Relationship r : projectNode.getRelationships(NodeRelationships.Contains) ){
-                    Node fileNode = r.getOtherNode(projectNode);
-                    searchFileSimilarity(threshold, similarities, fileNode);
-                }
+//
+//                for(Relationship r : projectNode.getRelationships(NodeRelationships.Contains) ){
+//                    Node fileNode = r.getOtherNode(projectNode);
+//                    searchFileSimilarity(threshold, similarities, fileNode);
+//                }
 
             }
             tx.success();

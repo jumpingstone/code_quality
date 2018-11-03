@@ -11,4 +11,8 @@ public interface SimilarityGraphicNode {
     Iterable<SimilarityGraphicNode> getSimilarNodes(float threshold);
 
     Path getFile();
+
+    Long getSize();
+
+    float getMaxSimilarity();
 }

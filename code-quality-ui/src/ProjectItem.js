@@ -6,14 +6,12 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import LinearProgress from '@material-ui/core/LinearProgress';
 
-import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
-
 import ScanIcon from '@material-ui/icons/PlayCircleFilled';
 
 import IconButton from '@material-ui/core/IconButton';
 import DashboardIcon from '@material-ui/icons/Dashboard';
-import ReportIcon from '@material-ui/icons/BubbleChart';
-import CancelIcon from '@material-ui/icons/Cancel';
+import CancelIcon from '@material-ui/icons/Cancel'
+
 
 import { API_URL } from './Util';
 import { postData } from './Util';
@@ -28,7 +26,6 @@ class ProjectItem extends Component {
         };
         this.doScan = this.doScan.bind(this);
         this.cancelScan = this.cancelScan.bind(this);
-        this.showResult = this.showResult.bind(this);
     }
 
     doScan() {
@@ -50,24 +47,9 @@ class ProjectItem extends Component {
 
     }
 
-    showResult() {
-        console.log("in do showResult");
-        fetch(API_URL + '/similarity/' + this.state.project.name + '/0.3')
-            .then(response => {
-                if (!response.ok) { throw response }
-                return response.json()
-            })
-            .then(data => {
-                this.setState({
-                    similarFiles: data
-                });
-            }) // JSON-string from `response.json()` call
-            .catch(error => console.error(error));
-    }
-
     handleListItemClick = (event) => {
         if (this.props.onSelected) {
-            this.props.onSelected(event, this.state.project.name);
+            this.props.onSelected(event, this.state.project);
         }
     };
 
@@ -98,9 +80,6 @@ class ProjectItem extends Component {
 
                 <IconButton aria-label={actionText} onClick={actionHandler}>
                     {actionIcon}
-                </IconButton>
-                <IconButton aria-label="Result" onClick={this.showResult}>
-                    <ReportIcon />
                 </IconButton>
 
 

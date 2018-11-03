@@ -10,18 +10,21 @@ class ProjectList extends React.Component {
         this.state = {
             selectedIndex: -1,
             projects: [],
-            selectedProjectName : ''
+            selectedProject : {}
         }
     }
 
-    handleListItemClick = (event, projectName) => {
-        this.setState({selectedProjectName : projectName});
+    handleListItemClick = (event, project) => {
+        this.setState({selectedProject : project});
+        if (this.props.onSelectedChanged) {
+            this.props.onSelectedChanged(event, project);
+        }
     };
 
     componentDidMount() {
-        fetch(API_URL + '/projects').
-            then(response => response.json())
-            .then(data => { console.log('setting state'); console.log(data); this.setState({ projects: data }) });
+        fetch(API_URL + '/projects')
+            .then(response => response.json())
+            .then(data => {this.setState({ projects: data }) });
     }
 
     render() {
@@ -31,7 +34,7 @@ class ProjectList extends React.Component {
 
                 {this.state.projects.map((project, i) => <ProjectItem key={i}
                     project={project} 
-                    selected={project.name === this.state.selectedProjectName}
+                    selected={project.name === this.state.selectedProject.name}
                     onSelected={this.handleListItemClick}/>)}
 
             </List>

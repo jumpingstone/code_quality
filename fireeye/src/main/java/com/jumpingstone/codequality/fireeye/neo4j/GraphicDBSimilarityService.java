@@ -30,27 +30,29 @@ public class GraphicDBSimilarityService implements FileSimilarityGraphic {
 
     @Override
     public SimilarityGraphicNode createNode(Path file) {
-        try (Transaction tx = graphicDB.beginTx()) {
-            Node projectNode = graphicDB.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
-                    project.getName());
-            Node node = graphicDB.createNode(GraphicLabels.Java_File);
-            node.setProperty(PropertyNames.PATH, file.toAbsolutePath().toString());
-            node.setProperty(PropertyNames.PROJECT_NAME, project.getName());
-            projectNode.createRelationshipTo(node, NodeRelationships.Contains);
-            tx.success();
-            return new GraphicFileNode(graphicDB, node);
+        SimilarityGraphicNode fileNode = getNode(file);
+        if (fileNode == null) {
+            try (Transaction tx = graphicDB.beginTx()) {
+                Node projectNode = graphicDB.findNode(GraphicLabels.Project, PropertyNames.PROJECT_NAME,
+                        project.getName());
+                Node node = graphicDB.createNode(GraphicLabels.Java_File);
+                node.setProperty(PropertyNames.PATH, file.toAbsolutePath().toString());
+                node.setProperty(PropertyNames.PROJECT_NAME, project.getName());
+                projectNode.createRelationshipTo(node, NodeRelationships.Contains);
+                tx.success();
+                fileNode = new GraphicFileNode(graphicDB, node);
+            }
         }
+        return fileNode;
     }
 
     @Override
     public SimilarityGraphicNode getNode(Path file) {
         GraphicFileNode fileNode = null;
         try (Transaction tx = graphicDB.beginTx()) {
-            ResourceIterator<Node> nodes = graphicDB.findNodes(GraphicLabels.Java_File,
-                    PropertyNames.PROJECT_NAME, project.getName(),
-                    PropertyNames.PATH, file.toAbsolutePath().toString());
-            if (nodes != null && nodes.hasNext()) {
-                fileNode = new GraphicFileNode(graphicDB, nodes.next());
+            Node node = findInternalNode(file, fileNode);
+            if (node != null) {
+                fileNode = new GraphicFileNode(graphicDB, node);
             }
             tx.success();
         }
@@ -72,12 +74,36 @@ public class GraphicDBSimilarityService implements FileSimilarityGraphic {
     @Override
     public void updateSimilarity(SimilarityGraphicNode newNode, SimilarityGraphicNode node, float similarity) {
         try (Transaction tx = graphicDB.beginTx()) {
-            GraphicFileNode otherNode = (GraphicFileNode) node;
-            Relationship relationship = ((GraphicFileNode) newNode).getNode().createRelationshipTo(otherNode.getNode(),
-                    NodeRelationships.Similar);
+            GraphicFileNode gNode = (GraphicFileNode) node;
+            GraphicFileNode newGNode = (GraphicFileNode) newNode;
+            Relationship relationship = null;
+            for(Relationship r :
+                    gNode.getNode().getRelationships(Direction.BOTH, NodeRelationships.Similar)) {
+                if (r.getOtherNode(gNode.getNode()).equals(newGNode)) {
+                    relationship = r;
+                    break;
+                }
+            }
+            if (relationship == null) {
+                relationship = newGNode.getNode().createRelationshipTo(gNode.getNode(),
+                        NodeRelationships.Similar);
+            }
             relationship.setProperty(PropertyNames.SIMILARITY, similarity);
             tx.success();
         }
+    }
+
+
+
+    private Node findInternalNode(Path file, GraphicFileNode fileNode) {
+        Node node = null;
+        ResourceIterator<Node> nodes = graphicDB.findNodes(GraphicLabels.Java_File,
+                PropertyNames.PROJECT_NAME, project.getName(),
+                PropertyNames.PATH, file.toAbsolutePath().toString());
+        if (nodes != null && nodes.hasNext()) {
+            node = nodes.next();
+        }
+        return node;
     }
 
 }

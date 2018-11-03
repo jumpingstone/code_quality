@@ -23,11 +23,11 @@ import Icon from '@material-ui/core/Icon';
 import DeleteIcon from '@material-ui/icons/Delete';
 import SearchIcon from '@material-ui/icons/Search';
 import InputBase from '@material-ui/core/InputBase';
-import ListSubheader from '@material-ui/core/ListSubheader';
-import BarChartIcon from '@material-ui/icons/BarChart';
-import LayersIcon from '@material-ui/icons/Layers';
-import AssignmentIcon from '@material-ui/icons/Assignment';
 import ProjectList from './ProjectList'
+import SimilarityChart from './Graphic'
+import NewProjectDialog from './NewProjectDialog'
+
+
 
 const drawerWidth = 300;
 
@@ -132,8 +132,17 @@ class App extends Component {
 
   handleDrawerClose = () => {
     this.setState({ open: false });
-  };
+  }
 
+  setProjectChangeListener = (listener) => {
+    this.projectChangeListener = listener;
+  }
+
+  handleProjectSelectionChange = (event, selectedProject) => {
+    if (this.projectChangeListener) {
+      this.projectChangeListener(selectedProject);
+    }
+  }
 
   render() {
     const isShow = this.state.isShow;
@@ -158,6 +167,7 @@ class App extends Component {
     } else {
       return (<React.Fragment>
         <CssBaseline />
+        <NewProjectDialog/>
         <div className={classes.root}>
           <AppBar
             position="absolute"
@@ -183,7 +193,7 @@ class App extends Component {
                 noWrap
                 className={classes.title}
               >
-                双兔
+                The Matrix
               </Typography>
               <div className={classes.search}>
                 <div className={classes.searchIcon}>
@@ -234,22 +244,13 @@ class App extends Component {
             <Divider />
 
             <Divider />
-            <ProjectList/>
+            <ProjectList onSelectedChanged={this.handleProjectSelectionChange}/>
           </Drawer>
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
-            <Typography variant="h4" gutterBottom component="h2">
-              Orders
-            </Typography>
             <Typography component="div" className={classes.chartContainer}>
-              {/* <SimpleLineChart /> */}
+              <SimilarityChart listToProjectEvent={this.setProjectChangeListener}/>
             </Typography>
-            <Typography variant="h4" gutterBottom component="h2">
-              Products
-            </Typography>
-            <div className={classes.tableContainer}>
-
-            </div>
           </main>
         </div>
       </React.Fragment>);
