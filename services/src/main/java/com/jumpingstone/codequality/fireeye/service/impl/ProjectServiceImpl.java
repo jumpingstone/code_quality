@@ -9,12 +9,19 @@ import com.jumpingstone.codequality.fireeye.service.ProjectService;
 import com.jumpingstone.codequality.fireeye.service.SimilarityResponse;
 import com.jumpingstone.codequality.fireeye.service.SimilarityService;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jgit.api.CloneCommand;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.hamcrest.Matcher;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
@@ -22,9 +29,11 @@ import java.util.Set;
 @Service
 public class ProjectServiceImpl implements ProjectService, SimilarityService {
 
+    private final String gitCodeBase = System.getProperty("user.home") + File.separator + "git_code_base";
+
     private ProjectManager projectManager = new ObjectFactory().createProjectManager(
             System.getProperty("user.home") + File.separator + ".jp_sim_graphic_db",
-            System.getProperty("user.home") + File.separator + "git_code_base"
+            gitCodeBase
             );
 
     @Override
@@ -32,6 +41,36 @@ public class ProjectServiceImpl implements ProjectService, SimilarityService {
         IProject project = projectManager.createProject(projectDefinition.getName(),
                 Paths.get(projectDefinition.getPath()));
         return Mono.just(project);
+    }
+
+    @Override
+    public Mono<IProject> cloneProject(String projectURI, String username, String password) {
+        Mono<IProject> result = null;
+        if (!Files.exists(Paths.get(gitCodeBase))) {
+            try {
+                Files.createDirectory(Paths.get(gitCodeBase));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            CloneCommand cloneCommand = Git.cloneRepository()
+                    .setURI( projectURI )
+                    .setDirectory(Paths.get(gitCodeBase).toFile());
+
+            if (StringUtils.isNotBlank(username)) {
+                cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+            }
+            Git git = cloneCommand.call();
+            File gitDir = git.getRepository().getDirectory();
+            IProject project = projectManager.createProject(gitDir.getName(),
+                    Paths.get(gitDir.getPath()));
+            result = Mono.just(project);
+        } catch (GitAPIException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     @Override

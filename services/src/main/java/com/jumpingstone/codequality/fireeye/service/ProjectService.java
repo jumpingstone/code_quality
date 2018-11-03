@@ -10,6 +10,8 @@ import reactor.core.publisher.Mono;
 public interface ProjectService {
     Mono<IProject> createProject(String project_id, ProjectDefinition projectDefinition);
 
+    Mono<IProject> cloneProject(String projectURI, String username, String password);
+
     int countProject(Matcher<IProject> matcher);
 
     Flux<IProject> findProject(Matcher<IProject> matcher);

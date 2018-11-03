@@ -3,6 +3,7 @@ package com.jumpingstone.codequality.fireeye.service.controller;
 import com.jumpingstone.codequality.fireeye.model.IProject;
 import com.jumpingstone.codequality.fireeye.model.ManagedProject;
 import com.jumpingstone.codequality.fireeye.service.ProjectService;
+import com.jumpingstone.codequality.fireeye.service.model.GitProjectDefinition;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
@@ -23,6 +24,13 @@ public class ProjectController {
     @PostMapping("/{project_id}")
     private Mono<IProject> createProject(@PathVariable String project_id, @RequestBody ProjectDefinition projectDefinition) {
         return projectManager.createProject(project_id, projectDefinition);
+    }
+
+    @PostMapping("/clone")
+    private Mono<IProject> cloneProject(@RequestBody GitProjectDefinition projectDefinition) {
+        return projectManager.cloneProject(projectDefinition.getURI(),
+                projectDefinition.getUsername(),
+                projectDefinition.getPassword());
     }
 
     @PostMapping("/scan/{project_id}")

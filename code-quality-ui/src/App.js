@@ -116,6 +116,7 @@ class App extends Component {
     this.state = {
       isShow: false,
       open: true,
+      openNewDialog: false,
       projects: []
     };
 
@@ -144,6 +145,12 @@ class App extends Component {
     }
   }
 
+  toggleNewProject = () => {
+    this.setState({
+      openNewDialog: !this.state.openNewDialog
+    });
+  }
+
   render() {
     const isShow = this.state.isShow;
     const { classes } = this.props;
@@ -167,7 +174,6 @@ class App extends Component {
     } else {
       return (<React.Fragment>
         <CssBaseline />
-        <NewProjectDialog/>
         <div className={classes.root}>
           <AppBar
             position="absolute"
@@ -226,7 +232,7 @@ class App extends Component {
           >
             <div className={classes.toolbarIcon}>
               <div>
-                <Button aria-label="Add" >
+                <Button aria-label="Add" onClick={this.handleNewProject}>
                   <AddIcon />
                 </Button>
                 <Button aria-label="Edit" className={classes.button}>
@@ -253,6 +259,9 @@ class App extends Component {
             </Typography>
           </main>
         </div>
+
+        <NewProjectDialog open={this.state.openNewDialog} onClose={this.toggleNewProject} 
+          fullScreen={true}/>
       </React.Fragment>);
     }
   }
