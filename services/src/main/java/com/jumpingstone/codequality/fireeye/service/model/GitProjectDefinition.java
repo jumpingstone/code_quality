@@ -4,7 +4,7 @@ package com.jumpingstone.codequality.fireeye.service.model;
  * Created by chenwei on 2018/11/3.
  */
 public class GitProjectDefinition {
-    private String URI;
+    private String gitRepo;
     private String username;
     private String password;
 
@@ -16,10 +16,6 @@ public class GitProjectDefinition {
         return username;
     }
 
-    public String getURI() {
-        return URI;
-    }
-
     public void setPassword(String password) {
         this.password = password;
     }
@@ -28,7 +24,11 @@ public class GitProjectDefinition {
         this.username = userName;
     }
 
-    public void setURI(String URI) {
-        this.URI = URI;
+    public String getGitRepo() {
+        return gitRepo;
+    }
+
+    public void setGitRepo(String gitRepo) {
+        this.gitRepo = gitRepo;
     }
 }

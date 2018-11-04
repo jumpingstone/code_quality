@@ -53,18 +53,31 @@ public class ProjectServiceImpl implements ProjectService, SimilarityService {
                 e.printStackTrace();
             }
         }
+        int lastIndex = projectURI.lastIndexOf('/');
+        String name = projectURI.substring(lastIndex + 1);
+        if (name.endsWith(".git")) {
+            name = name.substring(0, name.length() - 4);
+        }
+        String gitDir = gitCodeBase + File.separator + name;
+        if (!Files.exists(Paths.get(gitDir))) {
+            try {
+                Files.createDirectory(Paths.get(gitDir));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             CloneCommand cloneCommand = Git.cloneRepository()
                     .setURI( projectURI )
-                    .setDirectory(Paths.get(gitCodeBase).toFile());
+                    .setDirectory(Paths.get(gitDir).toFile());
 
             if (StringUtils.isNotBlank(username)) {
                 cloneCommand.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
             }
             Git git = cloneCommand.call();
-            File gitDir = git.getRepository().getDirectory();
-            IProject project = projectManager.createProject(gitDir.getName(),
-                    Paths.get(gitDir.getPath()));
+            File gitDirectory = git.getRepository().getDirectory();
+            IProject project = projectManager.createProject(gitDirectory.getName(),
+                    Paths.get(gitDirectory.getPath()));
             result = Mono.just(project);
         } catch (GitAPIException e) {
             e.printStackTrace();

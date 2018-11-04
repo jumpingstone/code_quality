@@ -142,8 +142,12 @@ class SimilarityChart extends Component {
                     />
                 </div>
             );
-        } else {
-            return "Not Ready";
+        } else {return (
+            <div>
+                <h3>Similarity: {this.state.similarityLevel}%</h3>
+                <StepSlider value={this.state.similarityLevel} onValueChanged={this.changeSimilarityLevel}/>
+            </div>
+        );
         }
     }
 }

@@ -28,7 +28,7 @@ public class ProjectController {
 
     @PostMapping("/clone")
     private Mono<IProject> cloneProject(@RequestBody GitProjectDefinition projectDefinition) {
-        return projectManager.cloneProject(projectDefinition.getURI(),
+        return projectManager.cloneProject(projectDefinition.getGitRepo(),
                 projectDefinition.getUsername(),
                 projectDefinition.getPassword());
     }

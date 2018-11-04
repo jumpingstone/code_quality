@@ -9,7 +9,7 @@ export const postData = (url, data = {})  => {
           mode: "cors", // no-cors, cors, *same-origin
           cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
           headers: {
-              "Content-Type": "application/json; charset=utf-8",
+              "Content-Type": "application/json",
               "Accept": "application/json; charset=utf-8",
               // "Content-Type": "application/x-www-form-urlencoded",
           },

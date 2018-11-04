@@ -42,7 +42,9 @@ class NewProjectDialog extends React.Component {
       project: {
         name: '',
         path: '',
-        gitRepo: ''
+        gitRepo: '',
+        username: '',
+        password: ''
       }
     }
   }
@@ -57,23 +59,44 @@ class NewProjectDialog extends React.Component {
   }
 
   setProjectName = (event) => {
-    this.state.projec.name = event.target.value;
+    var project = { ...this.state.project }
+    project.name = event.target.value;
+    this.setState({ project })
   }
   setProjectPath = (event) => {
-    this.state.project.path = event.target.value;
+    var project = { ...this.state.project }
+    project.path = event.target.value;
+    this.setState({ project })
   }
   setGitRepo = (event) => {
-    this.state.project.gitRepo = event.target.value;
+    var project = { ...this.state.project }
+    project.gitRepo = event.target.value;
+    this.setState({ project })
+  }
+
+  setUsername = (event) => {
+    var project = { ...this.state.project }
+    project.username = event.target.value;
+    this.setState({ project })
+  }
+
+  setPassword = (event) => {
+    var project = { ...this.state.project }
+    project.password = event.target.value;
+    this.setState({ project })
   }
 
   handleCreate = () => {
     console.log("in create new project");
     const { value } = this.state;
-    var url = API_URL + '/projects/create' + this.state.project.name;
+    var url = API_URL + '/projects/create/' + this.state.project.name;
     var data = { name: this.state.project.name, path: this.state.project.path };
-    if (value = 1) {
+    if (value === 1) {
       url = API_URL + '/projects/clone';
-      var data = { URL: this.state.project.gitRepo, username:'', password:'' };
+      var data = {
+        gitRepo: this.state.project.gitRepo, username: this.state.project.username,
+        password: this.state.project.password
+      };
     }
     postData(url, data)
       .then(response => {
@@ -149,9 +172,28 @@ class NewProjectDialog extends React.Component {
               label="Git Repository URL"
               type="text"
               value={this.state.project.gitRepo}
-              onChange={this.getGitRepo}
+              onChange={this.setGitRepo}
               fullWidth
-            /></React.Fragment>}
+            /><TextField
+                autoFocus
+                margin="dense"
+                id="username"
+                label="UserName"
+                type="text"
+                value={this.state.project.username}
+                onChange={this.setUsername}
+                fullWidth
+              />
+              <TextField
+                autoFocus
+                margin="dense"
+                id="password"
+                label="Password"
+                type="password"
+                value={this.state.project.password}
+                onChange={this.setPassword}
+                fullWidth
+              /></React.Fragment>}
 
           </DialogContent>
           <DialogActions>
