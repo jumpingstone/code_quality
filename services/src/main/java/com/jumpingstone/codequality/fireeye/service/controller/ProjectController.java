@@ -21,7 +21,7 @@ public class ProjectController {
     @Autowired
     private ProjectService projectManager;
 
-    @PostMapping("/{project_id}")
+    @PostMapping("/create/{project_id}")
     private Mono<IProject> createProject(@PathVariable String project_id, @RequestBody ProjectDefinition projectDefinition) {
         return projectManager.createProject(project_id, projectDefinition);
     }

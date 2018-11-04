@@ -120,6 +120,7 @@ class App extends Component {
       projects: []
     };
 
+    this.handleNewProject = this.handleNewProject.bind(this);
   }
 
 
@@ -143,6 +144,12 @@ class App extends Component {
     if (this.projectChangeListener) {
       this.projectChangeListener(selectedProject);
     }
+  }
+
+  handleNewProject() {
+    this.setState({
+      openNewDialog: true
+    });
   }
 
   toggleNewProject = () => {
