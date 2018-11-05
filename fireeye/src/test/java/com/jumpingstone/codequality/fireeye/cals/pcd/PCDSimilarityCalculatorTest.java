@@ -54,6 +54,6 @@ public class PCDSimilarityCalculatorTest {
         Path file2 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/conversion/DoubleCH.java");
 
         float value = calculator.calculate(file1, file2);
-        assertTrue(value < 0.9);
+        assertTrue(value < 0.95);
     }
 }
