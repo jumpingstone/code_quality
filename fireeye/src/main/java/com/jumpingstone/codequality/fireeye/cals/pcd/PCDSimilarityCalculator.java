@@ -67,7 +67,7 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
         for(LineRange r : leftRanges) {
             List<String> lines = loader.getCodeSlice(r.startLine, r.endLine);
             for (String line : lines) {
-                commonLength += line.length();
+                commonLength += line.length() + 1;
             }
         }
 
@@ -91,16 +91,21 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
     }
 
     private void merge(List<LineRange> ranges, LineRange newRange) {
-        boolean found = false;
-        for (LineRange r : ranges) {
+        Iterator<LineRange> iterator = ranges.iterator();
+        LineRange mergeRange = null;
+        while(iterator.hasNext()) {
+            LineRange r = iterator.next();
             if (r.intersect(newRange)) {
                 r.merge(newRange);
-                found = true;
+                mergeRange = r;
+                iterator.remove();;
                 break;
             }
         }
-        if (!found) {
+        if (mergeRange == null) {
             ranges.add(newRange);
+        } else {
+            merge(ranges, mergeRange);
         }
     }
 
