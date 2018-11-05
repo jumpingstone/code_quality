@@ -46,4 +46,14 @@ public class PCDSimilarityCalculatorTest {
         assertTrue(value < 1.0);
     }
 
+
+    @Test
+    public void givenVerySimilarFiles_compare_similarityLessThan100() throws IOException {
+        PCDSimilarityCalculator calculator = new PCDSimilarityCalculator();
+        Path file1 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/conversion/FloatCH.java");
+        Path file2 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/conversion/DoubleCH.java");
+
+        float value = calculator.calculate(file1, file2);
+        assertTrue(value < 0.1);
+    }
 }
