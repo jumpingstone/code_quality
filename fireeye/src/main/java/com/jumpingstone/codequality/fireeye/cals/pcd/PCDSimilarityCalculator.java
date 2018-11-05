@@ -28,8 +28,19 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
         int commonLength = 0;
         for (Iterator<Match> it = cpd.getMatches(); it.hasNext(); ) {
             Match match = it.next();
-            String source = match.getSourceCodeSlice();
-            commonLength += source.length();
+            int matchAllFiles = 0;
+            for(Mark mark : match.getMarkSet()) {
+                if (mark.getFilename().equals(file.toAbsolutePath().toString())) {
+                    matchAllFiles |= 1;
+                } else  if (mark.getFilename().equals(file2compare.toAbsolutePath().toString())) {
+                    matchAllFiles |= 2;
+                }
+            }
+
+            if (matchAllFiles == 3) {
+                String source = match.getSourceCodeSlice();
+                commonLength += source.length();
+            }
         }
 
         final CommentCheck checker = new CommentCheck();
