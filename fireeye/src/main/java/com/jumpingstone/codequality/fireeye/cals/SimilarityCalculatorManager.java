@@ -50,13 +50,13 @@ public class SimilarityCalculatorManager {
                 logger.info("calculate similarity of two files : \n" + file + " <<--->> \n" + fileToCompare);
                 float similarity = calculate(fileToCompare, file);
                 logger.info("calculate file similarity result = " + similarity);
-                if (similarity > 0.3) {
+//                if (similarity > 0.3) {
                     logger.info("update file similarity");
                     network.updateSimilarity(newNode, node, similarity);
 
                     Iterator<SimilarityGraphicNode> similarNodes = node.getSimilarNodes(0.8f).iterator();
                     visit(file, newNode, network, visitedMap, similarNodes);
-                }
+//                }
             }
         }
     }
@@ -68,7 +68,7 @@ public class SimilarityCalculatorManager {
             float score = 0;
             try {
                 score = c.calculate(file, fileToCompare);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
             scores.put(c.getClass(), score);

@@ -1,6 +1,7 @@
 package com.jumpingstone.codequality.fireeye.cals.pcd;
 
 import com.jumpingstone.codequality.fireeye.SimilarityCalculator;
+import com.jumpingstone.codequality.fireeye.cals.CommentCheck;
 import net.sourceforge.pmd.cpd.*;
 
 import java.io.IOException;
@@ -43,6 +44,10 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
                 .filter(l -> !l.trim().startsWith("import ") && !l.trim().startsWith("package"))
                 .map(l -> l.length() + 1).reduce((a,b)-> a+ b).get();
 
+        if (Math.min(leftLength, rightLength) / Math.max(leftLength, rightLength) > 10
+                && Math.min(leftLength, rightLength) < 100) {
+            return 0;
+        }
         return commonLength * 1.0f / Math.min(leftLength, rightLength);
     }
 
@@ -69,25 +74,4 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
     }
 
 
-    private class CommentCheck {
-        boolean inComment = false;
-        public boolean isComment(String line) {
-            line = line.trim();
-            if (!inComment) {
-                if (line.startsWith("/*")) {
-                    inComment = true;
-                    return true;
-                } else if (line.startsWith("//")) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else if (line.endsWith("*/")) {
-                inComment = false;
-                return true;
-            } else {
-                return true;
-            }
-        }
-    }
 }

@@ -6,6 +6,8 @@ import StepSlider from './StepSlider'
 import { API_URL } from './Util';
 
 const myConfig = {
+    height: 800,
+    width: 1200,
     nodeHighlightBehavior: true,
     node: {
         labelProperty : 'label',
@@ -27,6 +29,7 @@ class SimilarityChart extends Component {
         var self = this;
         this.props.listToProjectEvent((project) => {
             self.updateProject(project);
+            self.setState({project: project});
         });
     }
     componentDidMount() {
@@ -80,7 +83,7 @@ class SimilarityChart extends Component {
     }
 
     onMouseOverLink = (source, target) => {
-        window.alert(`Mouse over in link between ${source} and ${target}`);
+       // window.alert(`Mouse over in link between ${source} and ${target}`);
     }
 
     render() {
@@ -123,7 +126,7 @@ class SimilarityChart extends Component {
             nodes.forEach(n => {
                 // if (n.similarity > 0.7) {
                     var ints = Math.floor(n.similarity * 255)
-                    n.color = '#f442' + ints.toString(16);
+                    n.color = '#' + ints.toString(16) + '0000';
                 // }
                 n.size = n.size / 10 + 10;
             })

@@ -93,7 +93,7 @@ class NewProjectDialog extends React.Component {
     var data = { name: this.state.project.name, path: this.state.project.path };
     if (value === 1) {
       url = API_URL + '/projects/clone';
-      var data = {
+      data = {
         gitRepo: this.state.project.gitRepo, username: this.state.project.username,
         password: this.state.project.password
       };
@@ -107,10 +107,26 @@ class NewProjectDialog extends React.Component {
         this.setState({
           project: data
         });
+        this.doScan();
       }) // JSON-string from `response.json()` call
       .catch(error => console.error(error));
 
     this.handleClose();
+  }
+
+  doScan() {
+    console.log("in do scan");
+    postData(API_URL + '/projects/scan/' + this.state.project.name)
+        .then(response => {
+            if (!response.ok) { throw response }
+            return response.json()
+        })
+        .then(data => {
+            this.setState({
+                project: data
+            });
+        }) // JSON-string from `response.json()` call
+        .catch(error => console.error(error));
   }
 
   handleTabChange = (event, value) => {
@@ -118,13 +134,11 @@ class NewProjectDialog extends React.Component {
   };
 
   render() {
-    this.state.open = this.props.open;
-
     const { value } = this.state;
     return (
       <div>
         <Dialog
-          open={this.state.open}
+          open={this.props.open}
           onClose={this.handleClose}
           aria-labelledby="responsive-dialog-title"
         >

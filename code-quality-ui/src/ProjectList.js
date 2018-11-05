@@ -27,6 +27,14 @@ class ProjectList extends React.Component {
             .then(data => {this.setState({ projects: data }) });
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.expectedProjectNumber !== this.state.expectedProjectNumber) {
+            fetch(API_URL + '/projects')
+                .then(response => response.json())
+                .then(data => {this.setState({ projects: data }) });
+        }
+    }
+
     render() {
         return (
             <List>

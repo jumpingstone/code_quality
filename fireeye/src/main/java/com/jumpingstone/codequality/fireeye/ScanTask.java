@@ -75,7 +75,7 @@ public class ScanTask implements Callable<Void> {
                     }
                 });
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             logger.error(e.getMessage(), e);
             progressMonitor.setCanceled(true);
         }
@@ -84,20 +84,20 @@ public class ScanTask implements Callable<Void> {
     }
 
     protected Map<Path,Integer> calculatorEffort(Collection<Path> sourceDirs) throws IOException {
-        Map<Path,Integer> countmap = new HashMap<>();
+        Map<Path,Integer> countMap = new HashMap<>();
         for(Path path : sourceDirs) {
             long count = Files.find(path, 20, (file, attr) -> Files.isRegularFile(file)
                 && file.toString().endsWith(".java"), FileVisitOption.FOLLOW_LINKS).count();
-            countmap.put(path, (int)count);
+            countMap.put(path, (int)count);
         }
-        return countmap;
+        return countMap;
     }
 
     private Collection<Path> findSourceDir(Path projectPath) throws IOException {
         Stream<Path> pathStream =
                 Files.find(projectPath, 4, (path, attr)-> Files.isDirectory(path)
-                        && path.endsWith("src")
-                        && !path.toAbsolutePath().toString().contains(File.separator + "test"),
+                        && path.endsWith("main")
+                        && path.toAbsolutePath().toString().contains(File.separator + "src" + File.separator),
                         FileVisitOption.FOLLOW_LINKS);
 
         return pathStream.collect(Collectors.toCollection(HashSet::new));

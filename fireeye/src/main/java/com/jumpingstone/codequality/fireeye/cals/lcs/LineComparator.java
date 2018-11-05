@@ -40,6 +40,7 @@ class LineComparator implements IRangeComparator {
 
     public int getRangeTextLength(int startLine, int endLine) {
         int count = 0;
+        endLine = endLine >= fLines.length? fLines.length -1 : endLine;
         for(int i = startLine; i <= endLine; i++) {
             count += fLines[i].length();
         }

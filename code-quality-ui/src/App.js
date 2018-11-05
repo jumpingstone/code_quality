@@ -117,7 +117,8 @@ class App extends Component {
       isShow: false,
       open: true,
       openNewDialog: false,
-      projects: []
+      projects:[],
+      projectsNumber : 0
     };
 
     this.handleNewProject = this.handleNewProject.bind(this);
@@ -153,8 +154,10 @@ class App extends Component {
   }
 
   toggleNewProject = () => {
+    
     this.setState({
-      openNewDialog: !this.state.openNewDialog
+      openNewDialog: !this.state.openNewDialog,
+      projectsNumber : this.state.projectsNumber + 1 
     });
   }
 
@@ -257,7 +260,7 @@ class App extends Component {
             <Divider />
 
             <Divider />
-            <ProjectList onSelectedChanged={this.handleProjectSelectionChange}/>
+            <ProjectList onSelectedChanged={this.handleProjectSelectionChange} expectedProjectNumber={this.state.projectsNumber}/>
           </Drawer>
           <main className={classes.content}>
             <div className={classes.appBarSpacer} />
