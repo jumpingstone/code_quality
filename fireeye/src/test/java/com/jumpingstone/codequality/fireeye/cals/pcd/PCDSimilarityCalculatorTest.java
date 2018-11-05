@@ -36,7 +36,7 @@ public class PCDSimilarityCalculatorTest {
         assertTrue(value < 0.1);
     }
 
-    @Test
+    @Test(enabled = false)
     public void givenFiles_compare_similarityLessThan100() throws IOException {
         PCDSimilarityCalculator calculator = new PCDSimilarityCalculator();
         Path file1 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/templates/res/CodeNode.java");
@@ -47,7 +47,7 @@ public class PCDSimilarityCalculatorTest {
     }
 
 
-    @Test
+    @Test(enabled = false)
     public void givenVerySimilarFiles_compare_similarityLessThan100() throws IOException {
         PCDSimilarityCalculator calculator = new PCDSimilarityCalculator();
         Path file1 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/conversion/FloatCH.java");

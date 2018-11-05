@@ -13,6 +13,7 @@
     "d3-zoom": "^1.7.3",
     "react": "^16.6.0",
     "react-d3-graph": "^2.0.0-rc1",
+    "react-diff-view": "^1.8.1",
     "react-dom": "^16.6.0",
     "react-modal": "^3.6.1",
     "react-scripts": "2.1.0",

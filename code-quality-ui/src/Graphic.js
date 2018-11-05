@@ -1,22 +1,12 @@
 import React, { Component } from 'react'
 import './App.css'
 import { Graph } from 'react-d3-graph';
-import StepSlider from './StepSlider'
+import StepSlider from './StepSlider';
 
+import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
 import { API_URL } from './Util';
-
-const myConfig = {
-    height: 800,
-    width: 1200,
-    nodeHighlightBehavior: true,
-    node: {
-        labelProperty : 'label',
-        fontSize : 14
-    },
-    link: {
-        highlightColor: 'lightblue'
-    }
-};
 
 class SimilarityChart extends Component {
     constructor(props) {
@@ -31,7 +21,14 @@ class SimilarityChart extends Component {
             self.updateProject(project);
             self.setState({project: project});
         });
+
+        this.onMouseOverLink = this.onMouseOverLink.bind(this);
     }
+
+  componentWillMount(){
+    this.setState({height: window.innerHeight});
+  }
+
     componentDidMount() {
     }
     componentDidUpdate() {
@@ -63,8 +60,8 @@ class SimilarityChart extends Component {
 
     truncateProjectPath = (path) => {
         var startIndex = path.indexOf(this.state.project.path);
-        if (startIndex > 0) {
-            return path.substring(startIndex);
+        if (startIndex === 0) {
+            return path.substring(this.state.project.path.length);
         }
         return path;
     }
@@ -82,13 +79,40 @@ class SimilarityChart extends Component {
         return label;
     }
 
-    onMouseOverLink = (source, target) => {
+    onMouseOverLink(source, target) {
        // window.alert(`Mouse over in link between ${source} and ${target}`);
+       this.setState({selectedFile1: this.truncateProjectPath(source),
+        selectedFile2: this.truncateProjectPath(target),
+        similarity : this.findSimilarity(source, target)})
     }
+
+    findSimilarity = (source, target) => {
+        var link = this.data.links.find(l => l.source === source &&
+            l.target === target);
+        if (link) {
+            return link.similarity * 100;
+        }
+        return 'unknown';
+     }
+ 
 
     render() {
         var nodes = [];
         var links = [];
+
+
+        var myConfig = {
+            height: 800,
+            width: window.innerWidth - 320,
+            nodeHighlightBehavior: true,
+            node: {
+                labelProperty : 'label',
+                fontSize : 14
+            },
+            link: {
+                highlightColor: 'lightblue'
+            }
+        };
 
         if (this.state.similarFiles) {
             this.state.similarFiles.map((node, i) => {
@@ -120,7 +144,7 @@ class SimilarityChart extends Component {
                          size: node.peerSize, connections: 1, similarity: node.value });
                 }
 
-                links.push({ source: file, target: peer });
+                links.push({ source: file, target: peer, similarity : node.value });
             });
 
             nodes.forEach(n => {
@@ -132,11 +156,32 @@ class SimilarityChart extends Component {
             })
         }
         var data = { nodes: nodes, links: links };
+        this.data = data;
         if (nodes.length) {
             return (
                 <div>
-                    <h3>Similarity: {this.state.similarityLevel}%</h3>
+                    <Grid container spacing={24}>
+                        <Grid item xs={3}>
+                        <h5>Similarity: {this.state.similarityLevel}%</h5>
+                        </Grid>
+                        <Grid item xs={9}>
+                        <Paper elevation={1}>
+                        <Typography component="p">
+                        {this.state.selectedFile1}
+                        </Typography>
+                        <Typography component="p">
+                        {this.state.similarity}
+                        </Typography>
+                        <Typography component="p">
+                        {this.state.selectedFile2}
+                        </Typography>
+                    </Paper>
+                        </Grid>
+                    </Grid>
                     <StepSlider value={this.state.similarityLevel} onValueChanged={this.changeSimilarityLevel}/>
+
+                    
+
                     <Graph
                         id="file-similarity-graph-id" // id is mandatory, if no id is defined rd3g will throw an error
                         data={data}
