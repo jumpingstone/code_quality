@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-export const API_URL = 'http://localhost:9000';
+export const API_URL = 'http://10.58.91.167:9000';
 
 export const postData = (url, data = {})  => {
     // Default options are marked with *

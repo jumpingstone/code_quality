@@ -1,7 +1,6 @@
 package com.jumpingstone.codequality.fireeye.cals.pcd;
 
 
-import com.jumpingstone.codequality.fireeye.cals.lcs.LCSCalculator;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -36,24 +35,34 @@ public class PCDSimilarityCalculatorTest {
         assertTrue(value < 0.1);
     }
 
-    @Test(enabled = false)
+    @Test()
     public void givenFiles_compare_similarityLessThan100() throws IOException {
         PCDSimilarityCalculator calculator = new PCDSimilarityCalculator();
-        Path file1 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/templates/res/CodeNode.java");
-        Path file2 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/app/engine/impl/RuntimeRuleCacheHandler.java");
+        Path file1 = Paths.get("./src/test/resources/files/CodeNode.java");
+        Path file2 = Paths.get("./src/test/resources/files/RuntimeRuleCacheHandler.java");
 
         float value = calculator.calculate(file1, file2);
         assertTrue(value < 1.0);
     }
 
 
-    @Test(enabled = false)
+    @Test()
     public void givenVerySimilarFiles_compare_similarityLessThan100() throws IOException {
         PCDSimilarityCalculator calculator = new PCDSimilarityCalculator();
-        Path file1 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/conversion/FloatCH.java");
-        Path file2 = Paths.get("/data/sfsf/gitworkspace/trunk/au-ruleengine/au-ruleengine-gorule/src/main/java/com/successfactors/ruleengine/gorule/org/mvel2/conversion/DoubleCH.java");
-
+        Path file1 = Paths.get("./src/test/resources/files/FloatCH.java");
+        Path file2 = Paths.get("./src/test/resources/files/DoubleCH.java");
         float value = calculator.calculate(file1, file2);
         assertTrue(value < 0.95);
+    }
+
+
+    @Test()
+    public void givenFilesWithConstantLiteralOnly_compare_similarityLessThan100() throws IOException {
+        PCDSimilarityCalculator calculator = new PCDSimilarityCalculator();
+        Path file1 = Paths.get("./src/test/resources/files/SFConfig.java");
+        Path file2 = Paths.get("./src/test/resources/files/SystemBean.java");
+
+        float value = calculator.calculate(file1, file2);
+        assertTrue(value < 0.5);
     }
 }

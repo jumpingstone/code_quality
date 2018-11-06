@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000", methods={RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(origins = {"http://localhost:3000", "http://10.58.91.167:3000"
+}, methods={RequestMethod.GET, RequestMethod.POST})
 @RequestMapping("/similarity")
 public class CodeSimilarityController {
 

@@ -25,9 +25,9 @@ class SimilarityChart extends Component {
         this.onMouseOverLink = this.onMouseOverLink.bind(this);
     }
 
-  componentWillMount(){
-    this.setState({height: window.innerHeight});
-  }
+    componentWillMount(){
+        this.setState({height: window.innerHeight});
+    }
 
     componentDidMount() {
     }
@@ -111,6 +111,9 @@ class SimilarityChart extends Component {
             },
             link: {
                 highlightColor: 'lightblue'
+            },
+            d3 : {
+                gravity : -200
             }
         };
 

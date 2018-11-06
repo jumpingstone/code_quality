@@ -28,7 +28,7 @@ public class PCDSimilarityCalculator implements SimilarityCalculator {
 
         };
         configuration.setMinimumTileSize(100);
-        configuration.setLanguage(createLanguage(true, true, true, true));
+        configuration.setLanguage(createLanguage(true, false, true, true));
         CPD cpd = new CPD(configuration);
         cpd.add(file.toFile());
         cpd.add(file2compare.toFile());
