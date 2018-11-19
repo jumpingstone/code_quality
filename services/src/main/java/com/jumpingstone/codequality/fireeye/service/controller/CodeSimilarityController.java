@@ -27,4 +27,9 @@ public class CodeSimilarityController {
                                                       @PathVariable Integer file_id, @PathVariable Float threshold) {
         return similarityService.findSimilarityFiles(project_id, file_id, threshold);
     }
+
+    @GetMapping("/{project_id}")
+    private Mono<SimilarityStatisticResponse> getStatisticResponse(@PathVariable String projectId) {
+        return similarityService.getSimilarityStatistic(projectId);
+    }
 }

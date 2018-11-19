@@ -61,6 +61,10 @@ public class ProjectManager {
         }
     }
 
+    public Map<Float,Integer> getSimilarityStatistic(String project_id) {
+
+    },
+
     public Set<Similarity> findSimilarityFiles(String project_id, Float threshold) {
         Set<Similarity> similarities = new HashSet<>();
         try (Transaction tx = projectGraphicDatabase.beginTx()){

@@ -8,6 +8,7 @@ import com.jumpingstone.codequality.fireeye.model.Similarity;
 import com.jumpingstone.codequality.fireeye.service.ProjectService;
 import com.jumpingstone.codequality.fireeye.service.SimilarityResponse;
 import com.jumpingstone.codequality.fireeye.service.SimilarityService;
+import com.jumpingstone.codequality.fireeye.service.controller.SimilarityStatisticResponse;
 import com.jumpingstone.codequality.fireeye.service.model.ProjectDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jgit.api.CloneCommand;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -107,6 +109,12 @@ public class ProjectServiceImpl implements ProjectService, SimilarityService {
     public int countProject(Matcher<IProject> matcher) {
         List<IProject> projects = projectManager.findProject(matcher);
         return projects.size();
+    }
+
+    @Override
+    public Mono<SimilarityStatisticResponse> getSimilarityStatistic(String project_id) {
+        Map<Float, Integer> similarities = projectManager.getSimilarityStatistic(project_id);
+        return Mono.just(new SimilarityStatisticResponse(project_id, similarities));
     }
 
     @Override
